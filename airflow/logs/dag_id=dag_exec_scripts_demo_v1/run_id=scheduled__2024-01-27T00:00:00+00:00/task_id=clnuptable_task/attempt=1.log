@@ -1,0 +1,53 @@
+[2024-01-29T03:32:07.705+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:32:07.718+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:32:07.718+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T03:32:07.749+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): clnuptable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T03:32:07.751+0530] {standard_task_runner.py:60} INFO - Started process 12380 to run task
+[2024-01-29T03:32:07.757+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo_v1', 'clnuptable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '343', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmp_c2a6ohm']
+[2024-01-29T03:32:07.759+0530] {standard_task_runner.py:88} INFO - Job 343: Subtask clnuptable_task
+[2024-01-29T03:32:07.817+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T03:32:07.947+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo_v1' AIRFLOW_CTX_TASK_ID='clnuptable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T03:32:07.947+0530] {sql.py:276} INFO - Executing: delete from airflownew.employees
+[2024-01-29T03:32:07.958+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:32:08.010+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:32:08.027+0530] {sql.py:450} INFO - Running statement: delete from airflownew.employees, parameters: None
+[2024-01-29T03:32:08.029+0530] {sql.py:459} INFO - Rows affected: 10
+[2024-01-29T03:32:08.046+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=dag_exec_scripts_demo_v1, task_id=clnuptable_task, execution_date=20240127T000000, start_date=20240128T220207, end_date=20240128T220208
+[2024-01-29T03:32:08.072+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-29T03:32:08.116+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2024-01-29T03:41:42.967+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:41:42.980+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:41:42.980+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T03:41:43.032+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): clnuptable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T03:41:43.035+0530] {standard_task_runner.py:60} INFO - Started process 12604 to run task
+[2024-01-29T03:41:43.039+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo_v1', 'clnuptable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '343', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmpp0x_xs2g']
+[2024-01-29T03:41:43.041+0530] {standard_task_runner.py:88} INFO - Job 343: Subtask clnuptable_task
+[2024-01-29T03:41:43.088+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T03:41:43.157+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo_v1' AIRFLOW_CTX_TASK_ID='clnuptable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T03:41:43.157+0530] {sql.py:276} INFO - Executing: delete from airflownew.employees
+[2024-01-29T03:41:43.162+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:41:43.192+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:41:43.205+0530] {sql.py:450} INFO - Running statement: delete from airflownew.employees, parameters: None
+[2024-01-29T03:41:43.206+0530] {sql.py:459} INFO - Rows affected: 10
+[2024-01-29T03:41:43.215+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=dag_exec_scripts_demo_v1, task_id=clnuptable_task, execution_date=20240127T000000, start_date=20240128T221142, end_date=20240128T221143
+[2024-01-29T03:41:43.255+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-29T03:41:43.298+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2024-01-29T03:49:46.852+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:49:46.862+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:49:46.862+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T03:49:46.887+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): clnuptable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T03:49:46.890+0530] {standard_task_runner.py:60} INFO - Started process 12856 to run task
+[2024-01-29T03:49:46.898+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo_v1', 'clnuptable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '345', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmp2fjinj3g']
+[2024-01-29T03:49:46.899+0530] {standard_task_runner.py:88} INFO - Job 345: Subtask clnuptable_task
+[2024-01-29T03:49:46.954+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo_v1.clnuptable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T03:49:47.049+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo_v1' AIRFLOW_CTX_TASK_ID='clnuptable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T03:49:47.050+0530] {sql.py:276} INFO - Executing: use airflownew;
+delete from employees;
+[2024-01-29T03:49:47.057+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:49:47.090+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:49:47.108+0530] {sql.py:450} INFO - Running statement: use airflownew;
+delete from employees;, parameters: None
+[2024-01-29T03:49:47.109+0530] {sql.py:459} INFO - Rows affected: 0
+[2024-01-29T03:49:47.122+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=dag_exec_scripts_demo_v1, task_id=clnuptable_task, execution_date=20240127T000000, start_date=20240128T221946, end_date=20240128T221947
+[2024-01-29T03:49:47.190+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-29T03:49:47.247+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

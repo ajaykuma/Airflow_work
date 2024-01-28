@@ -1,0 +1,283 @@
+[2024-01-29T02:21:02.466+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:21:02.481+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:21:02.485+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T02:21:02.515+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): createtable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T02:21:02.518+0530] {standard_task_runner.py:60} INFO - Started process 10448 to run task
+[2024-01-29T02:21:02.524+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo', 'createtable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '337', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmpd29mvtim']
+[2024-01-29T02:21:02.526+0530] {standard_task_runner.py:88} INFO - Job 337: Subtask createtable_task
+[2024-01-29T02:21:02.604+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T02:21:02.733+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo' AIRFLOW_CTX_TASK_ID='createtable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T02:21:02.734+0530] {sql.py:276} INFO - Executing: create database if not exists airflow; 
+use airflow;
+create table if not exists airflow.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );
+
+[2024-01-29T02:21:02.744+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:21:02.817+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:21:02.863+0530] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/providers/common/sql/operators/sql.py", line 282, in execute
+    output = hook.run(
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/providers/common/sql/hooks/sql.py", line 391, in run
+    with closing(self.get_conn()) as conn:
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/providers/mysql/hooks/mysql.py", line 195, in get_conn
+    return MySQLdb.connect(**conn_config)
+  File "/usr/local/lib/python3.8/dist-packages/MySQLdb/__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/MySQLdb/connections.py", line 193, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (2005, "Unknown MySQL server host 'mysql' (-3)")
+[2024-01-29T02:21:02.903+0530] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=dag_exec_scripts_demo, task_id=createtable_task, execution_date=20240127T000000, start_date=20240128T205102, end_date=20240128T205102
+[2024-01-29T02:21:02.988+0530] {standard_task_runner.py:107} ERROR - Failed to execute job 337 for task createtable_task ((2005, "Unknown MySQL server host 'mysql' (-3)"); 10448)
+[2024-01-29T02:21:03.024+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2024-01-29T02:21:03.174+0530] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2024-01-29T02:31:04.150+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:31:04.158+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:31:04.158+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T02:31:04.184+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): createtable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T02:31:04.186+0530] {standard_task_runner.py:60} INFO - Started process 10801 to run task
+[2024-01-29T02:31:04.191+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo', 'createtable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '339', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmp6rscuv8m']
+[2024-01-29T02:31:04.193+0530] {standard_task_runner.py:88} INFO - Job 339: Subtask createtable_task
+[2024-01-29T02:31:04.255+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T02:31:04.360+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo' AIRFLOW_CTX_TASK_ID='createtable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T02:31:04.360+0530] {sql.py:276} INFO - Executing: create database if not exists airflow; 
+use airflow;
+create table if not exists airflow.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );
+
+[2024-01-29T02:31:04.370+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:31:04.411+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:31:04.427+0530] {sql.py:450} INFO - Running statement: create database if not exists airflow; 
+use airflow;
+create table if not exists airflow.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );
+, parameters: None
+[2024-01-29T02:31:04.437+0530] {sql.py:459} INFO - Rows affected: 1
+[2024-01-29T02:31:04.468+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=dag_exec_scripts_demo, task_id=createtable_task, execution_date=20240127T000000, start_date=20240128T210104, end_date=20240128T210104
+[2024-01-29T02:31:04.528+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-29T02:31:04.554+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2024-01-29T02:41:46.751+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:41:46.758+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:41:46.759+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T02:41:46.792+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): createtable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T02:41:46.797+0530] {standard_task_runner.py:60} INFO - Started process 11137 to run task
+[2024-01-29T02:41:46.800+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo', 'createtable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '339', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmp2b0nbs5z']
+[2024-01-29T02:41:46.802+0530] {standard_task_runner.py:88} INFO - Job 339: Subtask createtable_task
+[2024-01-29T02:41:46.875+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T02:41:46.972+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo' AIRFLOW_CTX_TASK_ID='createtable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T02:41:46.972+0530] {sql.py:276} INFO - Executing: create database if not exists airflow-new; 
+use airflow-new;
+create table if not exists airflow-new.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );
+[2024-01-29T02:41:46.979+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:41:47.027+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:41:47.057+0530] {sql.py:450} INFO - Running statement: create database if not exists airflow-new; 
+use airflow-new;
+create table if not exists airflow-new.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );, parameters: None
+[2024-01-29T02:41:47.058+0530] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/providers/common/sql/operators/sql.py", line 282, in execute
+    output = hook.run(
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/providers/common/sql/hooks/sql.py", line 398, in run
+    self._run_command(cur, sql_statement, parameters)
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/providers/common/sql/hooks/sql.py", line 455, in _run_command
+    cur.execute(sql_statement)
+  File "/usr/local/lib/python3.8/dist-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+  File "/usr/local/lib/python3.8/dist-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/usr/local/lib/python3.8/dist-packages/MySQLdb/connections.py", line 257, in query
+    _mysql.connection.query(self, query)
+MySQLdb.ProgrammingError: (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-new; \nuse airflow-new;\ncreate table if not exists airflow-new.employees \n( emp_' at line 1")
+[2024-01-29T02:41:47.066+0530] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=dag_exec_scripts_demo, task_id=createtable_task, execution_date=20240127T000000, start_date=20240128T211146, end_date=20240128T211147
+[2024-01-29T02:41:47.087+0530] {standard_task_runner.py:107} ERROR - Failed to execute job 339 for task createtable_task ((1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-new; \nuse airflow-new;\ncreate table if not exists airflow-new.employees \n( emp_' at line 1"); 11137)
+[2024-01-29T02:41:47.100+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2024-01-29T02:41:47.127+0530] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2024-01-29T02:44:16.000+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:44:16.011+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:44:16.011+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T02:44:16.044+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): createtable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T02:44:16.049+0530] {standard_task_runner.py:60} INFO - Started process 11212 to run task
+[2024-01-29T02:44:16.058+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo', 'createtable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '339', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmp67rvbqb7']
+[2024-01-29T02:44:16.064+0530] {standard_task_runner.py:88} INFO - Job 339: Subtask createtable_task
+[2024-01-29T02:44:16.174+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T02:44:16.277+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo' AIRFLOW_CTX_TASK_ID='createtable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T02:44:16.278+0530] {sql.py:276} INFO - Executing: create database if not exists airflownew; 
+use airflownew;
+create table if not exists airflownew.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );
+[2024-01-29T02:44:16.286+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:44:16.328+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:44:16.343+0530] {sql.py:450} INFO - Running statement: create database if not exists airflownew; 
+use airflownew;
+create table if not exists airflownew.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );, parameters: None
+[2024-01-29T02:44:16.359+0530] {sql.py:459} INFO - Rows affected: 1
+[2024-01-29T02:44:16.384+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=dag_exec_scripts_demo, task_id=createtable_task, execution_date=20240127T000000, start_date=20240128T211416, end_date=20240128T211416
+[2024-01-29T02:44:16.437+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-29T02:44:16.463+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2024-01-29T02:53:31.515+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:53:31.528+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T02:53:31.529+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T02:53:31.560+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): createtable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T02:53:31.562+0530] {standard_task_runner.py:60} INFO - Started process 11458 to run task
+[2024-01-29T02:53:31.568+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo', 'createtable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '339', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmplvtuxfuc']
+[2024-01-29T02:53:31.570+0530] {standard_task_runner.py:88} INFO - Job 339: Subtask createtable_task
+[2024-01-29T02:53:31.622+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T02:53:31.712+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo' AIRFLOW_CTX_TASK_ID='createtable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T02:53:31.712+0530] {sql.py:276} INFO - Executing: create database if not exists airflownew; 
+use airflownew;
+create table if not exists airflownew.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );
+[2024-01-29T02:53:31.718+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:53:31.759+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T02:53:31.784+0530] {sql.py:450} INFO - Running statement: create database if not exists airflownew; 
+use airflownew;
+create table if not exists airflownew.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );, parameters: None
+[2024-01-29T02:53:31.791+0530] {sql.py:459} INFO - Rows affected: 1
+[2024-01-29T02:53:31.819+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=dag_exec_scripts_demo, task_id=createtable_task, execution_date=20240127T000000, start_date=20240128T212331, end_date=20240128T212331
+[2024-01-29T02:53:31.865+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-29T02:53:31.902+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2024-01-29T03:03:13.889+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:03:13.898+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:03:13.898+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T03:03:13.919+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): createtable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T03:03:13.924+0530] {standard_task_runner.py:60} INFO - Started process 11661 to run task
+[2024-01-29T03:03:13.936+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo', 'createtable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '339', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmp2vi8hcwz']
+[2024-01-29T03:03:13.940+0530] {standard_task_runner.py:88} INFO - Job 339: Subtask createtable_task
+[2024-01-29T03:03:14.022+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T03:03:14.116+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo' AIRFLOW_CTX_TASK_ID='createtable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T03:03:14.116+0530] {sql.py:276} INFO - Executing: create database if not exists airflownew; 
+use airflownew;
+create table if not exists airflownew.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );
+[2024-01-29T03:03:14.122+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:03:14.162+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:03:14.178+0530] {sql.py:450} INFO - Running statement: create database if not exists airflownew; 
+use airflownew;
+create table if not exists airflownew.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );, parameters: None
+[2024-01-29T03:03:14.181+0530] {sql.py:459} INFO - Rows affected: 1
+[2024-01-29T03:03:14.206+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=dag_exec_scripts_demo, task_id=createtable_task, execution_date=20240127T000000, start_date=20240128T213313, end_date=20240128T213314
+[2024-01-29T03:03:14.272+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-29T03:03:14.308+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2024-01-29T03:07:09.392+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:07:09.486+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [queued]>
+[2024-01-29T03:07:09.486+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T03:07:09.661+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): createtable_task> on 2024-01-27 00:00:00+00:00
+[2024-01-29T03:07:09.664+0530] {standard_task_runner.py:60} INFO - Started process 11803 to run task
+[2024-01-29T03:07:09.713+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo', 'createtable_task', 'scheduled__2024-01-27T00:00:00+00:00', '--job-id', '339', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmpufr7c1y1']
+[2024-01-29T03:07:09.714+0530] {standard_task_runner.py:88} INFO - Job 339: Subtask createtable_task
+[2024-01-29T03:07:10.067+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo.createtable_task scheduled__2024-01-27T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T03:07:10.362+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo' AIRFLOW_CTX_TASK_ID='createtable_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-27T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-27T00:00:00+00:00'
+[2024-01-29T03:07:10.365+0530] {sql.py:276} INFO - Executing: create database if not exists airflownew; 
+use airflownew;
+create table if not exists airflownew.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );
+[2024-01-29T03:07:10.377+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:07:10.454+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:07:10.484+0530] {sql.py:450} INFO - Running statement: create database if not exists airflownew; 
+use airflownew;
+create table if not exists airflownew.employees 
+( emp_id int auto_increment primary key, 
+	first_name varchar(500) NOT null, 
+	last_name varchar(500) NOT null, 
+	hire_date date, 
+	job_id varchar(225), 
+	salary DECIMAL(7,2), 
+	commission_pct DECIMAL(6,2), 
+	manager_id int, dept_id int );, parameters: None
+[2024-01-29T03:07:10.489+0530] {sql.py:459} INFO - Rows affected: 1
+[2024-01-29T03:07:10.532+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=dag_exec_scripts_demo, task_id=createtable_task, execution_date=20240127T000000, start_date=20240128T213709, end_date=20240128T213710
+[2024-01-29T03:07:10.581+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-29T03:07:10.617+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

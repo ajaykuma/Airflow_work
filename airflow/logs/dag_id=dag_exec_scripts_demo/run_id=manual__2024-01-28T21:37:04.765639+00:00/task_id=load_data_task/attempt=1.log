@@ -1,0 +1,45 @@
+[2024-01-29T03:07:20.473+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.load_data_task manual__2024-01-28T21:37:04.765639+00:00 [queued]>
+[2024-01-29T03:07:20.492+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts_demo.load_data_task manual__2024-01-28T21:37:04.765639+00:00 [queued]>
+[2024-01-29T03:07:20.492+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T03:07:20.515+0530] {taskinstance.py:2191} INFO - Executing <Task(MySqlOperator): load_data_task> on 2024-01-28 21:37:04.765639+00:00
+[2024-01-29T03:07:20.518+0530] {standard_task_runner.py:60} INFO - Started process 11813 to run task
+[2024-01-29T03:07:20.522+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts_demo', 'load_data_task', 'manual__2024-01-28T21:37:04.765639+00:00', '--job-id', '342', '--raw', '--subdir', 'DAGS_FOLDER/6-create-dag-execute-scripts.py', '--cfg-path', '/tmp/tmponc9w98e']
+[2024-01-29T03:07:20.523+0530] {standard_task_runner.py:88} INFO - Job 342: Subtask load_data_task
+[2024-01-29T03:07:20.572+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts_demo.load_data_task manual__2024-01-28T21:37:04.765639+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T03:07:20.654+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts_demo' AIRFLOW_CTX_TASK_ID='load_data_task' AIRFLOW_CTX_EXECUTION_DATE='2024-01-28T21:37:04.765639+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2024-01-28T21:37:04.765639+00:00'
+[2024-01-29T03:07:20.655+0530] {sql.py:276} INFO - Executing: INSERT INTO airflownew.employees (`emp_id`,`first_name`,`last_name`, `hire_date`, `job_id`, `salary`, `commission_pct`, `manager_id`, `dept_id`) 
+VALUES (100,"Steven","King",'1987-06-17',"AD_PRES",24000.00,0.00,0,90), (101,"Neena","Kochhar",'1987-06-18',"AD_VP",17000.00,0.00,100,90), (102,"Lex","DeHaan",'1987-06-19',"AD_VP",17000.00,0.00,100,90), (103,"Alexander","Hunold",'1987-06-20',"IT_PROG",9000.00,0.00,102,60), (104,"Bruce","Ernst",'1987-06-21',"IT_PROG",6000.00,0.00,103,60), (105,"David","Austin",'1987-06-22',"IT_PROG",4800.00,0.00,103,60), (106,"Valli","Pataballa",'1987-06-23',"IT_PROG",4800.00,0.00,103,60), (107,"Diana","Lorentz",'1987-06-24',"IT_PROG",4200.00,0.00,103,60), (108,"Nancy","Greenberg",'1987-06-25',"FI_MGR",12000.00,0.00,101,100), (109,"Daniel","Faviet",'1987-06-26',"FI_ACCOUNT",9000.00,0.00,108,100); 
+SELECT DISTINCT (job_id) from airflownew.employees > out1.txt ;
+
+SELECT COUNT( DISTINCT (job_id)) from airflownew.employees > out2.txt;
+SELECT MAX(salary) from airflownew.employees > out3.txt ;
+SELECT MIN(salary) from airflownew.employees > out4.txt;
+[2024-01-29T03:07:20.665+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:07:20.700+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T03:07:20.713+0530] {sql.py:450} INFO - Running statement: INSERT INTO airflownew.employees (`emp_id`,`first_name`,`last_name`, `hire_date`, `job_id`, `salary`, `commission_pct`, `manager_id`, `dept_id`) 
+VALUES (100,"Steven","King",'1987-06-17',"AD_PRES",24000.00,0.00,0,90), (101,"Neena","Kochhar",'1987-06-18',"AD_VP",17000.00,0.00,100,90), (102,"Lex","DeHaan",'1987-06-19',"AD_VP",17000.00,0.00,100,90), (103,"Alexander","Hunold",'1987-06-20',"IT_PROG",9000.00,0.00,102,60), (104,"Bruce","Ernst",'1987-06-21',"IT_PROG",6000.00,0.00,103,60), (105,"David","Austin",'1987-06-22',"IT_PROG",4800.00,0.00,103,60), (106,"Valli","Pataballa",'1987-06-23',"IT_PROG",4800.00,0.00,103,60), (107,"Diana","Lorentz",'1987-06-24',"IT_PROG",4200.00,0.00,103,60), (108,"Nancy","Greenberg",'1987-06-25',"FI_MGR",12000.00,0.00,101,100), (109,"Daniel","Faviet",'1987-06-26',"FI_ACCOUNT",9000.00,0.00,108,100); 
+SELECT DISTINCT (job_id) from airflownew.employees > out1.txt ;
+
+SELECT COUNT( DISTINCT (job_id)) from airflownew.employees > out2.txt;
+SELECT MAX(salary) from airflownew.employees > out3.txt ;
+SELECT MIN(salary) from airflownew.employees > out4.txt;, parameters: None
+[2024-01-29T03:07:20.714+0530] {sql.py:459} INFO - Rows affected: 10
+[2024-01-29T03:07:20.715+0530] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/providers/common/sql/operators/sql.py", line 282, in execute
+    output = hook.run(
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/providers/common/sql/hooks/sql.py", line 407, in run
+    self.descriptions.append(cur.description)
+  File "/usr/lib/python3.8/contextlib.py", line 299, in __exit__
+    self.thing.close()
+  File "/usr/local/lib/python3.8/dist-packages/MySQLdb/cursors.py", line 103, in close
+    self._discard()
+  File "/usr/local/lib/python3.8/dist-packages/MySQLdb/cursors.py", line 95, in _discard
+    while con.next_result() == 0:  # -1 means no more data.
+MySQLdb.ProgrammingError: (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '> out1.txt ;\n\nSELECT COUNT( DISTINCT (job_id)) from airflownew.employees > out2.' at line 1")
+[2024-01-29T03:07:20.721+0530] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=dag_exec_scripts_demo, task_id=load_data_task, execution_date=20240128T213704, start_date=20240128T213720, end_date=20240128T213720
+[2024-01-29T03:07:20.737+0530] {standard_task_runner.py:107} ERROR - Failed to execute job 342 for task load_data_task ((1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '> out1.txt ;\n\nSELECT COUNT( DISTINCT (job_id)) from airflownew.employees > out2.' at line 1"); 11813)
+[2024-01-29T03:07:20.777+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2024-01-29T03:07:20.796+0530] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

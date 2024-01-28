@@ -1,0 +1,13 @@
+[2024-01-28T14:53:40.351+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sample_dag_with_python_operator_v4.get_age scheduled__2024-01-25T00:00:00+00:00 [queued]>
+[2024-01-28T14:53:40.365+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sample_dag_with_python_operator_v4.get_age scheduled__2024-01-25T00:00:00+00:00 [queued]>
+[2024-01-28T14:53:40.365+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 6
+[2024-01-28T14:53:40.408+0530] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): get_age> on 2024-01-25 00:00:00+00:00
+[2024-01-28T14:53:40.413+0530] {standard_task_runner.py:60} INFO - Started process 16368 to run task
+[2024-01-28T14:53:40.421+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'sample_dag_with_python_operator_v4', 'get_age', 'scheduled__2024-01-25T00:00:00+00:00', '--job-id', '284', '--raw', '--subdir', 'DAGS_FOLDER/2-create-dag-with-py-opr.py', '--cfg-path', '/tmp/tmp789lute_']
+[2024-01-28T14:53:40.426+0530] {standard_task_runner.py:88} INFO - Job 284: Subtask get_age
+[2024-01-28T14:53:40.516+0530] {task_command.py:423} INFO - Running <TaskInstance: sample_dag_with_python_operator_v4.get_age scheduled__2024-01-25T00:00:00+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-28T14:53:40.648+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='hdu' AIRFLOW_CTX_DAG_ID='sample_dag_with_python_operator_v4' AIRFLOW_CTX_TASK_ID='get_age' AIRFLOW_CTX_EXECUTION_DATE='2024-01-25T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-01-25T00:00:00+00:00'
+[2024-01-28T14:53:40.669+0530] {python.py:201} INFO - Done. Returned value was: None
+[2024-01-28T14:53:40.681+0530] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=sample_dag_with_python_operator_v4, task_id=get_age, execution_date=20240125T000000, start_date=20240128T092340, end_date=20240128T092340
+[2024-01-28T14:53:40.725+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-28T14:53:40.769+0530] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

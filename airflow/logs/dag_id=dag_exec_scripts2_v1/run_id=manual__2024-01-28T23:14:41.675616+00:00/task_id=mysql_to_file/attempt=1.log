@@ -1,0 +1,25 @@
+[2024-01-29T04:44:48.968+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: dag_exec_scripts2_v1.mysql_to_file manual__2024-01-28T23:14:41.675616+00:00 [queued]>
+[2024-01-29T04:44:48.977+0530] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: dag_exec_scripts2_v1.mysql_to_file manual__2024-01-28T23:14:41.675616+00:00 [queued]>
+[2024-01-29T04:44:48.978+0530] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-29T04:44:49.001+0530] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): mysql_to_file> on 2024-01-28 23:14:41.675616+00:00
+[2024-01-29T04:44:49.004+0530] {standard_task_runner.py:60} INFO - Started process 14034 to run task
+[2024-01-29T04:44:49.012+0530] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'dag_exec_scripts2_v1', 'mysql_to_file', 'manual__2024-01-28T23:14:41.675616+00:00', '--job-id', '354', '--raw', '--subdir', 'DAGS_FOLDER/7-create-dag-execute-scripts2.py', '--cfg-path', '/tmp/tmpjbrseqnw']
+[2024-01-29T04:44:49.013+0530] {standard_task_runner.py:88} INFO - Job 354: Subtask mysql_to_file
+[2024-01-29T04:44:49.061+0530] {task_command.py:423} INFO - Running <TaskInstance: dag_exec_scripts2_v1.mysql_to_file manual__2024-01-28T23:14:41.675616+00:00 [running]> on host mh1.myguest.virtualbox.org
+[2024-01-29T04:44:49.151+0530] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='dag_exec_scripts2_v1' AIRFLOW_CTX_TASK_ID='mysql_to_file' AIRFLOW_CTX_EXECUTION_DATE='2024-01-28T23:14:41.675616+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2024-01-28T23:14:41.675616+00:00'
+[2024-01-29T04:44:49.164+0530] {base.py:83} INFO - Using connection ID 'airflow_db' for task execution.
+[2024-01-29T04:44:49.181+0530] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/home/hdu/airflow/dags/7-create-dag-execute-scripts2.py", line 27, in mysql_to_file
+    with open("sql/sampleout1.csv", "w") as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'sql/sampleout1.csv'
+[2024-01-29T04:44:49.185+0530] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=dag_exec_scripts2_v1, task_id=mysql_to_file, execution_date=20240128T231441, start_date=20240128T231448, end_date=20240128T231449
+[2024-01-29T04:44:49.212+0530] {standard_task_runner.py:107} ERROR - Failed to execute job 354 for task mysql_to_file ([Errno 2] No such file or directory: 'sql/sampleout1.csv'; 14034)
+[2024-01-29T04:44:49.240+0530] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2024-01-29T04:44:49.272+0530] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
