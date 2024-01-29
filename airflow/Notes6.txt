@@ -7,16 +7,18 @@ sudo apt install mysql-server
 sudo su
 mysql
 
->alter user 'root'@'localhost' identified with mysql_native_password by 'abcd1234';
->create user 'hdu'@'localhost' identified with mysql_native_password by 'abcd1234';
->flush privileges;
->GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
->GRANT ALL PRIVILEGES ON *.* TO 'hdu'@'localhost' WITH GRANT OPTION;
+alter user 'root'@'localhost' identified with mysql_native_password by 'abcd1234';
+create user 'hdu'@'localhost' identified with mysql_native_password by 'abcd1234';
+flush privileges;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'hdu'@'localhost' WITH GRANT OPTION;
+
+exit
 
 mysql -u hdu -p
->create database airflow
->GRANT ALL PRIVILEGES ON airflow.* TO 'root'@'localhost' WITH GRANT OPTION;
->GRANT ALL PRIVILEGES ON airflow.* TO 'hdu'@'localhost' WITH GRANT OPTION;
+create database airflow
+GRANT ALL PRIVILEGES ON airflow.* TO 'root'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON airflow.* TO 'hdu'@'localhost' WITH GRANT OPTION;
 
 Apache Airflow's integration with MySQL is facilitated through the use of hooks and connections, 
 which are designed to interact with external systems and databases. 
@@ -29,13 +31,13 @@ sudo apt-get install libmysqlclient-dev
 sudo pip install mysqlclient (if mysqlclient installed already, reinstall it)
 pip install apache-airflow-providers-mysql
 
-check if installation was fine
+--check if installation was fine
 pip freeze | grep apache-airflow-providers-mysql
 
-if airflow already running, restart 
+--if airflow already running, restart 
 
-in UI > connections > DB
-and now check if mysql connection type shows up.
+--in UI > connections > DB
+--and now check if mysql connection type shows up.
 --configure
 
 The MySQL Operator Airflow is a built-in operator that allows you to execute SQL statements against a MySQL database.
