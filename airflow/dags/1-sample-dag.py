@@ -14,10 +14,9 @@ default_args = {
 
 }
 
-
 with DAG (
 
-    dag_id = 'sample_dag_v5',
+    dag_id = 'sample_dag_v1',
     description = 'Testing sample dag',
     default_args=default_args,
     start_date=datetime(2024,1,15,2),
@@ -39,14 +38,15 @@ with DAG (
         bash_command='echo I am third task and will run after first task '
     )
 
+    
     #First method
-    #task1.set_downstream(task2)
-    #task1.set_downstream(task3)
+    task1.set_downstream(task2)
+    task1.set_downstream(task3)
 
     #second method using bit shift operator
     #task1 >> task2
     #task1 >> task3
 
     #third method
-    task1 >> [task2,task3]
+    # task1 >> [task2,task3]
 
