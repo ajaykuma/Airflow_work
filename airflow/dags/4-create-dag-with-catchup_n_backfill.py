@@ -11,20 +11,24 @@ default_args = {
 }
 
 with DAG(
-    dag_id = 'dag_with_catchup_n_backfill_v1',
+    dag_id = 'dag_with_cron_v3',
     default_args=default_args,
-    start_date=datetime(2024,1,27),
-    schedule_interval='@daily',
-    catchup=False
+    start_date=datetime(2024,1,1),
+    schedule_interval='0 0 * * mon,wed,fri',
+    #catchup=True
 
 ) as dag:
     task1 = BashOperator(
         task_id = 'task1',
-        bash_command= 'echo testing'
+        bash_command = 'echo testing'
     )
 
 task1
+
 #testing backfill
+#set catchup=False
+#set start_date=datetime(2024,1,15)
+#set schedule_interval='@daily'
 #airflow dags list
 #airflow dags backfill -s 2024-1-10 -e 2024-1-15 <dagid>
 

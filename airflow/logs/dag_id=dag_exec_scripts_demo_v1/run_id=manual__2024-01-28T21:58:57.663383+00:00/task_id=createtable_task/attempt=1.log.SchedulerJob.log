@@ -1,1 +1,0 @@
-[2024-01-29T03:29:06.461+0530] {scheduler_job_runner.py:781} ERROR - Executor reports task instance <TaskInstance: dag_exec_scripts_demo_v1.createtable_task manual__2024-01-28T21:58:57.663383+00:00 [queued]> finished (success) although the task says it's queued. (Info: None) Was the task killed externally?
