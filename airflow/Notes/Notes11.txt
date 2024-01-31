@@ -1,0 +1,46 @@
+--Sensor Operator
+
+
+--import
+from airflow.providers.http.sensors.http import HttpSensor
+from airflow.providers.http.operators.http import SimpleHttpOperator
+
+--tasks
+
+tk_brk = BashOperator(
+	task_id = 'tk_brk',
+	bash_command = 'sleep 10'
+	)
+
+is_api_available = HttpSensor(
+	task_id = 'is_api_available',
+	http_conn_id = 'user_api',
+	endpoint = '/api',
+	#response_check=lambda response: "mydata" in response.txt,
+	poke_interval = 5,
+	timeout=20
+	)
+
+extract_user = SimpleHttpOperator(
+	task_id = 'extract_user',
+	http_conn_id = 'user_api',
+	endpoint = '/api',
+	method = 'GET',
+	response_filter = lambda response:json.loads(response.text),
+	log_response = True
+	)
+
+file_chk = FileSensor(
+	task_id = "is_file_avai",
+	fs_conn_id = "file_path",
+	filepath="mydata.csv",
+	poke_interval = 5,
+	timeout=20
+	)
+
+Note** Create file connection
+connection name : fs_conn_id
+conn type: File(path)
+Extras: {"path":"/<filepath>"}
+==========
+	
