@@ -2,7 +2,7 @@ from datetime import timedelta,datetime
 from airflow.decorators import dag, task
 from airflow import DAG, datasets, Dataset
 
-my_file = Dataset("configs/sample.txt")
+my_file = Dataset("/home/hdu/airflow/configs/sample.txt")
 # default_args = {
 
 #     'owner': 'hdu',

@@ -23,9 +23,9 @@ with DAG (
     dag_id = 'sample_dag1_for_cross_dag_chk_v0',
     description = 'Testing sample dag with python operator',
     default_args=default_args,
-    start_date=datetime(2024,1,1),
-    schedule_interval='@daily'
-    #schedule_interval=None
+    #start_date=datetime(2024,1,1),
+    #schedule_interval='@daily'
+    schedule_interval=None
 
 ) as dag:
     task1 = PythonOperator(

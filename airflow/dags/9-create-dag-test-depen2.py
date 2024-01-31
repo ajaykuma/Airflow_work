@@ -29,8 +29,8 @@ wait_for_other_dag_task = ExternalTaskSensor(
     #timeout=600,  # timeout in seconds
     # start_date=datetime(2024,1,27,2),
     # schedule_interval='@daily'
-    #execution_date_fn=lambda dt: dt,
-    execution_delta=timedelta(minutes=1),
+    execution_date_fn=lambda dt: dt,
+    #execution_delta=timedelta(minutes=1),
     dag=dag
     )
 
