@@ -1,4 +1,5 @@
-from datetime import datetime,timedelta,time
+from datetime import datetime,timedelta
+import time
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
@@ -43,3 +44,5 @@ with DAG('sample_dag_sla',
 	#sla=timedelta(seconds=5)	
 	
     )
+
+    t0 >> sla_task >> t1
