@@ -1,0 +1,175 @@
+#DAG with catchup & backfill
+------------------
+from airflow import DAG
+from datetime import datetime, timedelta
+from airflow.decorators import dag,task
+from airflow.operators.bash import BashOperator
+from airflow.operators.python import PythonOperator
+
+default_args = {
+    'owner': 'hdu',
+    'retries': 5,
+    'retry_delay': timedelta(minutes=5)
+}
+
+with DAG(
+    dag_id = 'dag_with_catchup_n_backfill_v0',
+    default_args=default_args,
+    start_date=datetime(2024,1,15),
+    schedule_interval='@daily',
+    catchup=True
+
+) as dag:
+    task1 = BashOperator(
+        task_id = 'task1',
+        bash_command= 'echo testing'
+    )
+
+task1
+
+============
+
+Now check with 'catchup' value as False.
+dag_id = 'dag_with_catchup_n_backfill_v1'
+
+--after done, setit back to catchup=True
+------------------
+
+--using backfill, with a command
+
+while DAG is running,
+--use command
+
+airflow dags backfill -s 2024-1-10 -e 2024-1-15 <dagid>
+=============
+
+#connecting to external stores/DBs
+Say mysql
+#on Ubuntu, install and setup MYSQL
+sudo apt install mysql-server
+
+--change to root and login into mysql
+sudo su
+mysql
+
+>alter user 'root'@'localhost' identified with mysql_native_password by 'abcd1234';
+>create user 'hdu'@'localhost' identified with mysql_native_password by 'abcd1234';
+>flush privileges;
+>GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+>GRANT ALL PRIVILEGES ON *.* TO 'hdu'@'localhost' WITH GRANT OPTION;
+
+mysql -u hdu -p
+>create database airflow
+>GRANT ALL PRIVILEGES ON airflow.* TO 'root'@'localhost' WITH GRANT OPTION;
+>GRANT ALL PRIVILEGES ON airflow.* TO 'hdu'@'localhost' WITH GRANT OPTION;
+
+Apache Airflow's integration with MySQL is facilitated through the use of hooks and connections, 
+which are designed to interact with external systems and databases. 
+The MySQLHook is a key component that allows Airflow to connect to a MySQL database, 
+enabling the execution of SQL commands and the transfer of data.
+
+#Setup mysql connector
+
+sudo apt-get install libmysqlclient-dev
+sudo pip install mysqlclient (if mysqlclient installed already, reinstall it)
+pip install apache-airflow-providers-mysql
+
+check if installation was fine
+pip freeze | grep apache-airflow-providers-mysql
+
+if airflow already running, restart 
+
+in UI > connections > DB
+and now check if mysql connection type shows up.
+--configure
+
+The MySQL Operator Airflow is a built-in operator that allows you to execute SQL statements against a MySQL database.
+It is part of the Airflow Providers for MySQL package, which must be installed separately.
+
+--Creating and updating tables
+--Inserting and deleting data
+--Running queries
+--Backing up and restoring databases
+--if using Hive then install ( pip install apache-airflow-providers-apache-hive)
+
+Before creating the dag file, create SQL directory to add SQL scripts 
+sudo mkdir -p /airflow/dags/sql
+
+
+--createdb.sql
+
+create database if not exists airflow;
+use airflow;
+create table if not exists airflow.employees
+( emp_id int auto_increment primary key,
+        first_name varchar(500) NOT null,
+        last_name varchar(500) NOT null,
+        hire_date date,
+        job_id varchar(225),
+        salary DECIMAL(7,2),
+        commission_pct DECIMAL(6,2),
+        manager_id int, dept_id int );
+
+--loadscr.sql
+
+INSERT INTO airflow.employees (`emp_id`,`first_name`,`last_name`, `hire_date`, `job_id`, `salary`, `commission_pct`, `manager_id`, `dept_id`)
+VALUES (100,"Steven","King",'1987-06-17',"AD_PRES",24000.00,0.00,0,90), (101,"Neena","Kochhar",'1987-06-18',"AD_VP",17000.00,0.00,100,90), (102,"Lex","DeHaan",'1987-06-19',"AD_VP",17000.00,0.00,100,90), (103,"Alexander","Hunold",'1987-06-20',"IT_PROG",9000.00,0.00,102,60), (104,"Bruce","Ernst",'1987-06-21',"IT_PROG",6000.00,0.00,103,60), (105,"David","Austin",'1987-06-22',"IT_PROG",4800.00,0.00,103,60), (106,"Valli","Pataballa",'1987-06-23',"IT_PROG",4800.00,0.00,103,60), (107,"Diana","Lorentz",'1987-06-24',"IT_PROG",4200.00,0.00,103,60), (108,"Nancy","Greenberg",'1987-06-25',"FI_MGR",12000.00,0.00,101,100), (109,"Daniel","Faviet",'1987-06-26',"FI_ACCOUNT",9000.00,0.00,108,100);
+SELECT DISTINCT (job_id) from airflow.employees;
+SELECT COUNT( DISTINCT (job_id)) from airflow.employees;
+SELECT MAX(salary) from airflow.employees;
+SELECT MIN(salary) from airflow.employees;
+
+---
+import airflow 
+from datetime import timedelta 
+from airflow import DAG 
+from airflow.operators.mysql_operator import MySqlOperator
+#from airflow.providers.apache.hive.operators.hive import HiveOperator 
+from airflow.utils.dates import days_ago
+
+default_args = { 
+    'owner': 'airflow', 
+    #'start_date': airflow.utils.dates.days_ago(2), 
+    # 'end_date': datetime(), 
+    # 'depends_on_past': False, 
+    # 'email': ['airflow@example.com'], 
+    # 'email_on_failure': False, 
+    # 'email_on_retry': False, 
+    #'retries': 1, 
+    'retry_delay': timedelta(minutes=5), }
+
+dag_exec_scripts = DAG( 
+    dag_id='dag_exec_scripts_demo', 
+    default_args=default_args, 
+    # schedule_interval='0 0 * * *', 
+    schedule_interval='@once', 
+    start_date=days_ago(1), 
+    dagrun_timeout=timedelta(minutes=60), 
+    description='executing the sql and hql scripts', )
+
+create_table = MySqlOperator( sql="sql/createdb.sql", 
+                             task_id="createtable_task", 
+                             mysql_conn_id="airflow_db", 
+                             dag=dag_exec_scripts ) 
+load_data = MySqlOperator( sql="sql/loadscr.sql", 
+                          task_id="load_data_task", 
+                          mysql_conn_id="airflow_db", 
+                          dag=dag_exec_scripts ) 
+
+create_table>>load_data
+
+================
+
+
+
+
+
+
+
+
+
+
+
+
+
+

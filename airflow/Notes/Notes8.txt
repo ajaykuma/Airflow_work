@@ -1,0 +1,34 @@
+Airflow 
+---------
+In UI, we have
+--Grid View
+--Calendar View
+--DAG Dependencies view
+--Dag View Auto-refresh
+--Datasets view
+--Logs directly in Grid View
+--Test connections functionality
+--DAG Next Run field (shows when DAG is scheduled to run next)
+
+Runs: Status of all previous DAG runs
+Recent Tasks: Status of tasks from all active DAG runs,
+or, if not currently active then from most recent run.
+
+Note** airflow scheduler triggers a DAG run at the end 
+of its schedule period, rather than at the beginning of it.
+
+Explore other options from UI of a DAG run, Task run : calendar,task tries/retries, task clear/schedule/queue,
+
+------------
+Security > List users > + to add new users and define roles.
+Security > List roles > shows roles and what permissions a role had.
+
+User > statistics to look at statistics related to user actions.
+
+-------------
+Explore Cluster activity
+
+
+
+
+

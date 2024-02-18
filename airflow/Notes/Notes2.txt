@@ -230,10 +230,12 @@ triggerer  | [2024-01-23T19:25:56.999+0530] {triggerer_job_runner.py:481} INFO -
 --Access web UI
 http://localhost:8080/home
 
+-----------------
 --to disable default DAGs
 AIRFLOW_HOME/airflow.cfg 
 
 set AIRFLOW__CORE__LOAD__EXAMPLES: False
 
 restart airflow...
+
 

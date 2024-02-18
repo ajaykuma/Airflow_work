@@ -1,0 +1,188 @@
+#Sharing Information between tasks
+-----------------------
+--we can achieve this by using xcoms.
+Task1 ---> xcoms (push) <-----(pull) Task2
+By default every function that return value will push
+information into xcom.
+
+Add a new function to 'create-dad-with-py-opr.py'
+
+from airflow import DAG
+from datetime import datetime, timedelta
+from airflow.operators.python import PythonOperator
+
+default_args = {
+
+    'owner': 'hdu',
+    'retries': 5,
+    'retry_delay': timedelta(minutes=5)
+}
+
+def greet(name,age):
+    print(f"Hello world, my name is {name},"
+          f" and I am {age} years old")
+
+
+def get_name():
+    return 'John'
+
+with DAG (
+
+    dag_id = 'sample_dag_with_python_operator_v1',
+    description = 'Testing sample dag with python operator',
+    default_args=default_args,
+    start_date=datetime(2024,1,15,2),
+    schedule_interval='@daily'
+
+) as dag:
+    # task1 = PythonOperator(
+    #     task_id ='greet',
+    #     python_callable=greet,
+    #     op_kwargs={'name': 'John', 'age': 25}) task1
+
+    task2 = PythonOperator(
+        task_id = 'get_name',
+        python_callable=get_name
+    )
+
+    task2
+===============
+Now using xcoms
+--here we change greet() to not include name paramter but include 'ti' which is task instance to call xcom.
+dag_id = 'sample_dag_with_python_operator_v2'
+
+and 
+def greet(age,ti):
+    name = ti.xcom_pull(task_ids='get_name')
+    print(f"Hello world, my name is {name},"
+          f" and I am {age} years old")
+
+also make changes in task1 and add dependencies between task1 and task2
+    task1 = PythonOperator(
+         task_id ='greet',
+         python_callable=greet,
+         op_kwargs={'age': 25}) 
+
+    task2 = PythonOperator(
+        task_id = 'get_name',
+        python_callable=get_name
+    )
+
+    task2 >> task1
+
+================
+--Pushing multiple values into xcoms
+
+--update version of DAG
+dag_id = 'sample_dag_with_python_operator_v3'
+
+modify the get_name function
+
+def get_name(ti):
+	ti.xcom_push(key='first_name', value='John')
+	ti.xcom_push(key='last_name', value='Morgan')
+
+--pull values in greet function using ti.xcom_pull
+
+def greet(age,ti):
+    first_name = ti.xcom_pull(task_ids='get_name', key = 'first_name')
+    last_name = ti.xcom_pull(task_ids='get_name', key = 'last_name')
+    print(f"Hello world, my name is {first_name} {last_name},"
+          f" and iam {age} years old ")
+=================
+
+--Add another function for age
+
+--update version
+dag_id = 'sample_dag_with_python_operator_v4'
+
+and 
+def get_age(ti):
+	ti.xcom_push(key='age', value=25)
+
+--add new task
+task3 = PythonOperator(
+     task_id = 'get_age',
+     python_callable=get_age)
+
+--in task1, remember to remove op_kwargs for age.
+--update greet function accordingly
+
+def greet(ti):
+    first_name = ti.xcom_pull(task_ids='get_name', key = 'first_name')
+    last_name = ti.xcom_pull(task_ids='get_name', key = 'last_name')
+    age = ti.xcom_pull(task_ids='get_age', key = 'age')
+    print(f"Hello world, my name is {first_name} {last_name},"
+          f" and iam {age} years old ")
+
+[task2,task3] >> task1
+
+=====================
+
+--final code as of now:
+---
+from airflow import DAG
+from datetime import datetime, timedelta
+from airflow.operators.python import PythonOperator
+
+#create instaance of DAG using 'with'
+
+
+#define common parameters which will be to initialize the operatr in default
+default_args = {
+
+    'owner': 'hdu',
+    'retries': 5,
+    'retry_delay': timedelta(minutes=5)
+}
+
+def greet(ti):
+    first_name = ti.xcom_pull(task_ids='get_name', key = 'first_name')
+    last_name = ti.xcom_pull(task_ids='get_name', key = 'last_name')
+    age = ti.xcom_pull(task_ids='get_age', key = 'age')
+    print(f"Hello world, my name is {first_name} {last_name},"
+          f" and iam {age} years old ")
+
+def get_name(ti):
+	ti.xcom_push(key='first_name', value='John')
+	ti.xcom_push(key='last_name', value='Morgan')
+
+def get_age(ti):
+	ti.xcom_push(key='age', value=25)
+      
+with DAG (
+
+    dag_id = 'sample_dag_with_python_operator_v4',
+    description = 'Testing sample dag with python operator',
+    default_args=default_args,
+    start_date=datetime(2024,1,15,2),
+    schedule_interval='@daily'
+
+) as dag:
+    task1 = PythonOperator(
+        task_id ='greet',
+        python_callable=greet
+        #op_kwargs={'age': 25}
+    )
+   
+    task2 = PythonOperator(
+        task_id = 'get_name',
+        python_callable=get_name
+    )
+
+    task3 = PythonOperator(
+     task_id = 'get_age',
+     python_callable=get_age)
+
+    [task2,task3] >> task1
+
+---
+
+=================================
+Note** Max size of xom is 48kb
+, thus never use xcom to share large data such as pandas dataframe.
+
+
+
+
+

@@ -1,0 +1,99 @@
+#Using TaskFlow API
+----------------
+If you write most of your DAGs using plain Python code rather than Operators, then the TaskFlow API will make it much easier 
+to author clean DAGs without extra boilerplate, all using the @task decorator.
+TaskFlow takes care of moving inputs and outputs between your Tasks using XComs for you, 
+It also automatically calculates dependencies - when you call a TaskFlow function in your DAG file, rather than executing it, 
+you will get an object representing the XCom for the result (an XComArg), 
+that you can then use as inputs to downstream tasks or operators.
+
+from airflow import DAG
+from datetime import datetime, timedelta
+from airflow.operators.python import PythonOperator
+from airflow.decorators import dag,task
+
+default_args = {
+
+    'owner': 'hdu',
+    'retries': 5,
+    'retry_delay': timedelta(minutes=5)
+}
+
+@dag(dag_id = 'sample_dag_with_taskflow_api_v0',
+    description = 'Testing sample dag with taskflow_v0',
+    default_args=default_args,
+    start_date=datetime(2024,1,28),schedule_interval='@daily')
+
+#create 3 tasks
+
+def new_etl():
+
+    @task()
+    def get_name():
+        return 'John'
+
+    @task() 
+    def get_age():
+	    return 25
+
+    @task()
+    def greet(name,age):
+        print(f"Hello world, my name is {name} "
+          f" and iam {age} years old ")
+      
+    name = get_name()
+    age = get_age()
+    greet(name=name,age=age)
+
+greet_dag = new_etl()
+=============
+
+--changing to get first_name and last_name
+from airflow import DAG
+from datetime import datetime, timedelta
+from airflow.operators.python import PythonOperator
+from airflow.decorators import dag,task
+
+default_args = {
+
+    'owner': 'hdu',
+    'retries': 5,
+    'retry_delay': timedelta(minutes=5)
+}
+
+@dag(dag_id = 'sample_dag_with_taskflow_api_v1',
+    description = 'Testing sample dag with taskflow',
+    default_args=default_args,
+    start_date=datetime(2024,1,28),schedule_interval='@daily')
+
+#create 3 tasks
+
+def new_etl():
+
+    @task(multiple_outputs=True)
+    def get_name():
+        return {
+             'first_name': 'John',
+             'last_name' : 'Morgan'
+        }
+
+    @task() 
+    def get_age():
+	    return 25
+
+    @task()
+    def greet(first_name,last_name,age):
+        print(f"Hello world, my name is {first_name} {last_name} "
+          f" and iam {age} years old ")
+      
+    name_dict = get_name()
+    age = get_age()
+    greet(first_name=name_dict['first_name'],last_name=name_dict['last_name'],age=age)
+
+greet_dag = new_etl()
+--------------
+
+
+
+
+

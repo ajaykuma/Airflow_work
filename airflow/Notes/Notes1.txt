@@ -1,0 +1,58 @@
+
+If
+--Working in virtual environment
+
+mkdir airflow_work
+cd airflow_work
+python -m venv py_env
+source py_env/bin/activate
+
+Install airflow locally
+Visit : https://github.com/apache/airflow
+        https://github.com/apache/airflow?tab=readme-ov-file#installing-from-pypi
+
+#Install
+pip install 'apache-airflow==2.8.1' \
+ --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt"
+
+or
+
+pip install 'apache-airflow[postgres,google]==2.8.1' \
+ --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt"
+
+Note**Change dependency to match local python version.
+If it notifies of missing gcc* dependencies, then install packages accordingly.
+[for example: xcode-select --install]
+
+#Initialize database fr airflow
+export AIRFLOW_HOME=.
+
+airflow db init
+
+airflow webserver -p 8080
+
+-- Open browser and login.(Id and pswd will be needed)
+
+#Generate id and pswd
+airflow users create --help
+
+airflow users create --username admin1 --firstname fname --lastname lname --role Admin 
+ --email fname.lname@gmail.com
+
+airflow webserver -p 8080
+
+airflow users list
+
+------------
+Check airflow server and browse UI.
+For example:
+Open a different terminal :
+export AIRFLOW_HOME=<path>
+
+--if schedulr not running, we can start a scheduler 'airflow scheduler'
+
+From browser activate : example_bash_operator and check status..
+
+-----------------------------------------
+
+
