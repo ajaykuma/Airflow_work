@@ -1,3 +1,5 @@
+#Building a flow & monitoring
+# refer Notes/Notes12.txt for more details
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator

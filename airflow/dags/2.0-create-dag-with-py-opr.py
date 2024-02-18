@@ -1,3 +1,5 @@
+#Refer Notes/Notes4.txt for more details
+
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
@@ -29,7 +31,7 @@ def get_age(ti):
       
 with DAG (
 
-    dag_id = 'sample_dag_with_python_operator_v4',
+    dag_id = 'sample_dag_with_python_operator_v0',
     description = 'Testing sample dag with python operator',
     default_args=default_args,
     start_date=datetime(2024,1,15,2),

@@ -1,3 +1,4 @@
+# refer Notes/Notes9.txt for more details
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
@@ -22,7 +23,7 @@ dag = DAG(
 ) 
 
 wait_for_other_dag_task = ExternalTaskSensor(
-    task_id='sample_dag1_for_cross_dag_chk_v1',
+    task_id='task2_sample_dag2_for_cross_dag_chk_v1',
     external_dag_id='sample_dag1_for_cross_dag_chk_v0',
     external_task_id='greet',
     #mode='reschedule',  # sensor frees up worker when criteria is not met

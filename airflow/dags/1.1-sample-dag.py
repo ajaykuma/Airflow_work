@@ -1,3 +1,4 @@
+#Refer Notes/Notes3.txt for more details
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.bash import BashOperator
@@ -16,7 +17,7 @@ default_args = {
 
 with DAG (
 
-    dag_id = 'sample_dag_v1',
+    dag_id = 'sample_dag_v0',
     description = 'Testing sample dag',
     default_args=default_args,
     start_date=datetime(2024,1,15,2),

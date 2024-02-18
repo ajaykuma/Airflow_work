@@ -1,3 +1,4 @@
+# refer Notes/Notes7-0.txt for more details
 import airflow 
 from datetime import timedelta 
 from airflow import DAG 
@@ -6,7 +7,7 @@ from airflow.operators.mysql_operator import MySqlOperator
 from airflow.utils.dates import days_ago
 
 default_args = { 
-    'owner': 'airflow', 
+    'owner': 'hdu', 
     #'start_date': airflow.utils.dates.days_ago(2), 
     # 'end_date': datetime(), 
     # 'depends_on_past': False, 
@@ -17,7 +18,7 @@ default_args = {
     'retry_delay': timedelta(minutes=5), }
 
 dag_exec_scripts = DAG( 
-    dag_id='dag_exec_scripts_demo_v2', 
+    dag_id='dag_exec_scripts_demo_v0', 
     default_args=default_args, 
     # schedule_interval='0 0 * * *', 
     schedule_interval='@once', 

@@ -1,3 +1,4 @@
+#Refer Notes/Notes5.txt for more details
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.decorators import dag,task
@@ -9,7 +10,7 @@ default_args = {
     'retry_delay': timedelta(minutes=5)
 }
 
-@dag(dag_id = 'sample_dag_with_taskflow_api_v1',
+@dag(dag_id = 'sample_dag_with_taskflow_api_v0',
     description = 'Testing sample dag with taskflow',
     default_args=default_args,
     start_date=datetime(2024,1,28),schedule_interval='@daily')

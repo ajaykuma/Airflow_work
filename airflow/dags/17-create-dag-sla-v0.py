@@ -1,3 +1,4 @@
+# refer Notes/Notes12.txt for more details
 from datetime import datetime,timedelta
 import time
 from airflow import DAG
@@ -45,4 +46,4 @@ with DAG('sample_dag_sla',
 	
     )
 
-    t0 >> sla_task >> t1
+t0 >> sla_task >> t1

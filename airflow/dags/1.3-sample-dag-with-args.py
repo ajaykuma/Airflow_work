@@ -1,9 +1,10 @@
+#Refer Notes/Notes3.txt for more details
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.bash import BashOperator
 import json
 
-file = open("/home/hdu/airflow/configs/dev2.json", 'r')
+file = open("/home/hdu/airflow/dags/configs/dev2.json", 'r')
 myconfigs = json.load(file)
 
 default_args = {
@@ -20,7 +21,7 @@ print(default_args)
 
 with DAG (
 
-    dag_id = 'sample_dag_v3',
+    dag_id = 'sample_dag_v1',
     description = 'Testing sample dag with args from file',
     default_args=default_args,
     start_date=datetime(2024,1,15,2),

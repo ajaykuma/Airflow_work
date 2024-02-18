@@ -1,47 +1,3 @@
-#DAG with catchup & backfill
-------------------
-from airflow import DAG
-from datetime import datetime, timedelta
-from airflow.decorators import dag,task
-from airflow.operators.bash import BashOperator
-from airflow.operators.python import PythonOperator
-
-default_args = {
-    'owner': 'hdu',
-    'retries': 5,
-    'retry_delay': timedelta(minutes=5)
-}
-
-with DAG(
-    dag_id = 'dag_with_catchup_n_backfill_v0',
-    default_args=default_args,
-    start_date=datetime(2024,1,15),
-    schedule_interval='@daily',
-    catchup=True
-
-) as dag:
-    task1 = BashOperator(
-        task_id = 'task1',
-        bash_command= 'echo testing'
-    )
-
-task1
-
-============
-
-Now check with 'catchup' value as False.
-dag_id = 'dag_with_catchup_n_backfill_v1'
-
---after done, setit back to catchup=True
-------------------
-
---using backfill, with a command
-
-while DAG is running,
---use command
-
-airflow dags backfill -s 2024-1-10 -e 2024-1-15 <dagid>
-=============
 
 #connecting to external stores/DBs
 Say mysql
@@ -50,6 +6,7 @@ sudo apt install mysql-server
 
 --change to root and login into mysql
 sudo su
+cd
 mysql
 
 >alter user 'root'@'localhost' identified with mysql_native_password by 'abcd1234';
@@ -59,10 +16,11 @@ mysql
 >GRANT ALL PRIVILEGES ON *.* TO 'hdu'@'localhost' WITH GRANT OPTION;
 
 mysql -u hdu -p
->create database airflow
+>create database airflow;
 >GRANT ALL PRIVILEGES ON airflow.* TO 'root'@'localhost' WITH GRANT OPTION;
 >GRANT ALL PRIVILEGES ON airflow.* TO 'hdu'@'localhost' WITH GRANT OPTION;
 
+exit;
 Apache Airflow's integration with MySQL is facilitated through the use of hooks and connections, 
 which are designed to interact with external systems and databases. 
 The MySQLHook is a key component that allows Airflow to connect to a MySQL database, 
@@ -74,7 +32,7 @@ sudo apt-get install libmysqlclient-dev
 sudo pip install mysqlclient (if mysqlclient installed already, reinstall it)
 pip install apache-airflow-providers-mysql
 
-check if installation was fine
+<optional>check if installation was fine
 pip freeze | grep apache-airflow-providers-mysql
 
 if airflow already running, restart 

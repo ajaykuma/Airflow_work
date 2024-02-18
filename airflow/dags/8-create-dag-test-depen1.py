@@ -1,3 +1,4 @@
+# refer Notes/Notes9.txt for more details
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator

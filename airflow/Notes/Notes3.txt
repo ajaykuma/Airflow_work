@@ -22,7 +22,7 @@ default_args = {
 
 with DAG (
 
-    dag_id = 'sample_dag_v1',
+    dag_id = 'sample_dag_v0',
     description = 'Testing sample dag',
     default_args=default_args,
     start_date=datetime(2024,1,15,2),
@@ -55,7 +55,7 @@ airflow dags show sample_dag_v5
 
 #EX2:
 #add more tasks to the DAG & change DAG ID
- dag_id = 'sample_dag_v2'
+ dag_id = 'sample_dag_v1'
 
 #tasks
     task2 = BashOperator(
@@ -136,54 +136,6 @@ and update in task
     )
 
 --------------------
-#schedule with cron expression
-schedule_interval parameter which receives cron expression as a string or a 
-datetime.timedelta object.
-
-Cron expression:
-5 fields= 15  14  1   	* 	*
-         min  hr day month day(week)
-Presets:
-None : Dont schedule, use for exclusively "enternally triggered" DAGs
-@once: Schedule once and only once
-@hourly: Run once an hour at the beginning of the hour [0 * * * *]
-@daily: Run once a day at midnight [0 0 * * *]
-@weekly: Run once a week at midnight on Sunday morning [0 0 * * 0]
-@monthly: Run once a month at midnight of the first day of the month [0 0 1 * * ]
-@yearly: Run once a year at midnight of January 1 [0 0 1 1 *]
-
-from airflow import DAG
-from datetime import datetime, timedelta
-from airflow.decorators import dag,task
-from airflow.operators.bash import BashOperator
-from airflow.operators.python import PythonOperator
-
-default_args = {
-    'owner': 'hdu',
-    'retries': 5,
-    'retry_delay': timedelta(minutes=5)
-}
-
-with DAG(
-    dag_id = 'dag_with_cron_v0',
-    default_args=default_args,
-    start_date=datetime(2024,1,26),
-    schedule_interval='0 0 * * *'
-    #schedule_interval='@daily'
-
-) as dag:
-    task1 = BashOperator(
-        task_id = 'task1',
-        bash_command= 'echo testing cron expression'
-    )
-
-task1
-
------------------------------
-Other options:
-
---3 am every tue,fri
-schedule_interval='0 3 * * Tue,Fri'
 
 
 

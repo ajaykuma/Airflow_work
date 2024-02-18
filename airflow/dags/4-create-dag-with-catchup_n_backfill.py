@@ -1,3 +1,4 @@
+# refer Notes/Notes6-0.txt for more details
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.decorators import dag,task
@@ -11,7 +12,7 @@ default_args = {
 }
 
 with DAG(
-    dag_id = 'dag_with_cron_v3',
+    dag_id = 'dag_with_cron_v0',
     default_args=default_args,
     start_date=datetime(2024,1,1),
     schedule_interval='0 0 * * mon,wed,fri',

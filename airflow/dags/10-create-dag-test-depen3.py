@@ -1,3 +1,4 @@
+# refer Notes/Notes9.txt for more details
 from datetime import timedelta
 from airflow.decorators import dag, task
 from airflow.sensors.time_delta import TimeDeltaSensorAsync

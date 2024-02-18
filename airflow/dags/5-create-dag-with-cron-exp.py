@@ -1,3 +1,4 @@
+# refer Notes/Notes6-0.txt for more details
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.decorators import dag,task

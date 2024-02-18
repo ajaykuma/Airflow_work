@@ -1,5 +1,5 @@
 import json
-file = open("/home/hdu/airflow/configs/dev.json", 'r')
+file = open("/home/hdu/airflow/dags/configs/dev2.json", 'r')
 myconfigs = json.load(file)
 
 print(type(myconfigs))

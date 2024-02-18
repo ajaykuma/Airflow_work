@@ -1,3 +1,4 @@
+# refer Notes/Notes7-1.txt for more details
 import airflow 
 import csv
 import logging
@@ -9,7 +10,7 @@ from airflow.providers.mysql.hooks.mysql import MySqlHook
 from airflow.utils.dates import days_ago
 
 default_args = { 
-    'owner': 'airflow', 
+    'owner': 'hdu', 
     #'start_date': airflow.utils.dates.days_ago(2), 
     # 'end_date': datetime(), 
     # 'depends_on_past': False, 
@@ -34,7 +35,7 @@ def mysql_to_file():
 
 
 with DAG( 
-    dag_id='dag_exec_scripts2_v1', 
+    dag_id='dag_exec_scripts_read_demo_v0', 
     default_args=default_args, 
     # schedule_interval='0 0 * * *', 
     schedule_interval='@once', 

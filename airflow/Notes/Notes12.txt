@@ -1,4 +1,6 @@
---Notifications
+#Notifications
+
+--example1:
 
 from datetime import datetime
 from airflow import DAG
@@ -26,7 +28,9 @@ with DAG('sample_dag_noti',
 	   email_n_failure=True
 	)
 
-===========
+---------------------
+--example 2:
+
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
@@ -86,8 +90,7 @@ with DAG('sample_dag_noti2',
     
 failure_task >> task3 >> task2 >> success_task
 
-=========
-
+<optional>
 email notifications are built-in airflow functionality
 To use them , simply configure an SMTP server
 
@@ -99,10 +102,14 @@ smtl_ssl = False
 smtp_port = 587
 smtp_mail_from = noreply@gmail.com
 
-================
-SLAs
-----
-from datetime import datetime,timedelta,time
+<optional ends>
+===========================
+
+
+#SLAs
+
+from datetime import datetime,timedelta
+import time
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
@@ -147,4 +154,6 @@ with DAG('sample_dag_sla',
 	#sla=timedelta(seconds=5)	
 	
     )
-----
+
+t0 >> sla_task >> t1
+-----
