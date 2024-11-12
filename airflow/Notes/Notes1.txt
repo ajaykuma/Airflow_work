@@ -4,8 +4,14 @@ If
 
 mkdir airflow_work
 cd airflow_work
+sudo apt-get update
+sudo apt-get install python3.8-venv
 python -m venv py_env
-source py_env/bin/activate
+hdu@mh2:~/airflow_work$ source py_env/bin/activate
+
+(py_env) hdu@mh2:~$ vi .bashrc
+(py_env) hdu@mh2:~$ source .bashrc
+hdu@mh2:~$ source py_env/bin/activate
 
 Install airflow locally
 Visit : https://github.com/apache/airflow
@@ -24,20 +30,57 @@ Note**Change dependency to match local python version.
 If it notifies of missing gcc* dependencies, then install packages accordingly.
 [for example: xcode-select --install]
 
+(py_env) hdu@mh2:~/airflow_work$ ls
+py_env
+(py_env) hdu@mh2:~/airflow_work$ ls py_env/
+bin  include  lib  lib64  pyvenv.cfg  share
+(py_env) hdu@mh2:~/airflow_work$ ls py_env/bin
+
+(py_env) hdu@mh2:~/airflow_work$ py_env/bin/airflow -h
+Usage: airflow [-h] GROUP_OR_COMMAND ...
+
+
+update path of airflow
+(py_env) hdu@mh2:~$ vi .bashrc
+
+export AIRFLOW_HOME=/home/hdu/airflow_work/py_env
+export PATH=$PATH:$AIRFLOW_HOME/bin
+
+(py_env) hdu@mh2:~$ source .bashrc
+
+hdu@mh2:~$ cd airflow_work/
+hdu@mh2:~/airflow_work$ source py_env/bin/activate
+(py_env) hdu@mh2:~/airflow_work$ airflow -h
+Usage: airflow [-h] GROUP_OR_COMMAND ...
+
+#Test airflow standalone
+(py_env) hdu@mh2:~/airflow_work$ airflow standalone
+standalone | Starting Airflow Standalone
+
+#ctrl+C
+
 #Initialize database fr airflow
-export AIRFLOW_HOME=.
 
-airflow db init
+(py_env) hdu@mh2:~/airflow_work$ airflow db init
 
-airflow webserver -p 8080
+
+(py_env) hdu@mh2:~/airflow_work$ airflow webserver -p 8080
 
 -- Open browser and login.(Id and pswd will be needed)
+
+If it shows warning
+WARNING - The swagger_ui directory could not be found.
+    Please install connexion with extra install: pip install connexion[swagger-ui]
+    or provide the path to your local installation by passing swagger_path=<your path>
+
+we can install the package..
+
+for now shutdown..
 
 #Generate id and pswd
 airflow users create --help
 
-airflow users create --username admin1 --firstname fname --lastname lname --role Admin 
- --email fname.lname@gmail.com
+airflow users create --username admin1 --firstname fname --lastname lname --role Admin --email fname.lname@gmail.com
 
 airflow webserver -p 8080
 
