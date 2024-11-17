@@ -17,7 +17,7 @@ Install airflow locally
 Visit : https://github.com/apache/airflow
         https://github.com/apache/airflow?tab=readme-ov-file#installing-from-pypi
 
-#Install
+#Install (we will use this)
 pip install 'apache-airflow==2.8.1' \
  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt"
 
@@ -53,12 +53,14 @@ hdu@mh2:~/airflow_work$ source py_env/bin/activate
 (py_env) hdu@mh2:~/airflow_work$ airflow -h
 Usage: airflow [-h] GROUP_OR_COMMAND ...
 
+--Starting standalone
 #Test airflow standalone
 (py_env) hdu@mh2:~/airflow_work$ airflow standalone
 standalone | Starting Airflow Standalone
 
 #ctrl+C
 
+--Starting a webserver
 #Initialize database fr airflow
 
 (py_env) hdu@mh2:~/airflow_work$ airflow db init
@@ -92,7 +94,7 @@ For example:
 Open a different terminal :
 export AIRFLOW_HOME=<path>
 
---if schedulr not running, we can start a scheduler 'airflow scheduler'
+--if scheduler not running, we can start a scheduler 'airflow scheduler'
 
 From browser activate : example_bash_operator and check status..
 

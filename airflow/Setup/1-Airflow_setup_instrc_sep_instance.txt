@@ -1,0 +1,146 @@
+#Setup Instructions
+----------------
+#To run a standalone:
+--Setup Ubuntu/Centos instances
+--Install java11 via 'sudo apt install openjdk-11-jdk'
+--Check python version, preferably above 3.6
+
+--update .bashrc for user
+alias python=python3
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+export PATH=$PATH:$JAVA_HOME/bin
+#export AIRFLOW_HOME=~/airflow
+
+--other packages which ay be required/helpful
+sudo apt install git -y
+sudo apt install vim -y
+sudo apt install openssh-server -y
+sudo apt install wget -y
+sudo apt install python3-pip
+sudo pip install pandas
+
+
+--Instructions to install
+
+export AIRFLOW_HOME=~/airflow
+
+--Install airflow using constraints file
+
+AIRFLOW_VERSION=2.8.1
+
+--Extract the version of Python you have installed. If you're currently using a Python version that is not supported by Airflow, 
+--you may want to set this manually.
+PYTHON_VERSION="$(python --version | cut -d " " -f 2 | cut -d "." -f 1-2)"
+
+echo $AIRFLOW_VERSION
+2.8.1
+
+echo $PYTHON_VERSION
+3.8
+
+CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
+--For example this would install 2.8.1 with python version: 
+echo $CONSTRAINT_URL
+https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt
+
+pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
+
+--We can individually start scheduler, webserver etc or start all in one as a standalone
+
+update .bashrc
+export AIRFLOW_HOME=/home/hdu/.local/
+export PATH=$PATH:$AIRFLOW_HOME/bin
+
+Commands:
+airflow -h
+airflow standalone
+airflow info
+airflow standalone
+
+------sample output-----
+
+hdu@mh1:~$ airflow standalone
+standalone | Starting Airflow Standalone
+standalone | Checking database is initialized
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+WARNI [unusual_prefix_b640e0e884ae8145646e4eb0bed05093a1dabf36_example_local_kubernetes_executor] Could not import DAGs in example_local_kubernetes_executor.py
+Traceback (most recent call last):
+  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/example_dags/example_local_kubernetes_executor.py", line 37, in <module>
+    from kubernetes.client import models as k8s
+ModuleNotFoundError: No module named 'kubernetes'
+WARNI [unusual_prefix_b640e0e884ae8145646e4eb0bed05093a1dabf36_example_local_kubernetes_executor] Install Kubernetes dependencies with: pip install apache-airflow[cncf.kubernetes]
+WARNI [unusual_prefix_1607d6d6df7596b1233d110ba20cbc9d50977527_example_kubernetes_executor] The example_kubernetes_executor example DAG requires the kubernetes provider. Please install it with: pip install apache-airflow[cncf.kubernetes]
+WARNI [airflow.models.crypto] empty cryptography key - values will not be stored encrypted.
+standalone | Database ready
+/home/hdu/.local/lib/python3.8/site-packages/flask_limiter/extension.py:336 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+triggerer  | ____________       _____________
+triggerer  | ____    |__( )_________  __/__  /________      __
+triggerer  | ____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /
+triggerer  | ___  ___ |  / _  /   _  __/ _  / / /_/ /_ |/ |/ /
+triggerer  | _/_/  |_/_/  /_/    /_/    /_/  \____/____/|__/
+triggerer  | [2024-01-23 19:18:54 +0530] [126401] [INFO] Starting gunicorn 21.2.0
+triggerer  | [2024-01-23 19:18:54 +0530] [126401] [INFO] Listening at: http://[::]:8794 (126401)
+triggerer  | [2024-01-23 19:18:54 +0530] [126401] [INFO] Using worker: sync
+triggerer  | [2024-01-23 19:18:54 +0530] [126402] [INFO] Booting worker with pid: 126402
+triggerer  | [2024-01-23 19:18:54 +0530] [126403] [INFO] Booting worker with pid: 126403
+scheduler  | ____________       _____________
+scheduler  | ____    |__( )_________  __/__  /________      __
+scheduler  | ____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /
+scheduler  | ___  ___ |  / _  /   _  __/ _  / / /_/ /_ |/ |/ /
+scheduler  | _/_/  |_/_/  /_/    /_/    /_/  \____/____/|__/
+scheduler  | [2024-01-23T19:18:55.982+0530] {task_context_logger.py:63} INFO - Task context logging is enabled
+scheduler  | [2024-01-23T19:18:56.003+0530] {executor_loader.py:115} INFO - Loaded executor: SequentialExecutor
+triggerer  | [2024-01-23T19:18:56.119+0530] {triggerer_job_runner.py:174} INFO - Setting up TriggererHandlerWrapper with handler <FileTaskHandler (NOTSET)>
+triggerer  | [2024-01-23T19:18:56.127+0530] {triggerer_job_runner.py:230} INFO - Setting up logging queue listener with handlers [<RedirectStdHandler <stdout> (NOTSET)>, <TriggererHandlerWrapper (NOTSET)>]
+triggerer  | [2024-01-23T19:18:56.191+0530] {triggerer_job_runner.py:331} INFO - Starting the triggerer
+scheduler  | [2024-01-23T19:18:56.218+0530] {scheduler_job_runner.py:808} INFO - Starting the scheduler
+scheduler  | [2024-01-23T19:18:56.223+0530] {scheduler_job_runner.py:815} INFO - Processing each file at most -1 times
+scheduler  | [2024-01-23 19:18:56 +0530] [126413] [INFO] Starting gunicorn 21.2.0
+scheduler  | [2024-01-23T19:18:56.282+0530] {manager.py:169} INFO - Launched DagFileProcessorManager with pid: 126415
+scheduler  | [2024-01-23T19:18:56.292+0530] {scheduler_job_runner.py:1619} INFO - Adopting or resetting orphaned tasks for active dag runs
+scheduler  | [2024-01-23T19:18:56.300+0530] {settings.py:60} INFO - Configured default timezone UTC
+scheduler  | [2024-01-23 19:18:56 +0530] [126413] [INFO] Listening at: http://[::]:8793 (126413)
+scheduler  | [2024-01-23 19:18:56 +0530] [126413] [INFO] Using worker: sync
+scheduler  | [2024-01-23 19:18:56 +0530] [126416] [INFO] Booting worker with pid: 126416
+scheduler  | [2024-01-23 19:18:56 +0530] [126417] [INFO] Booting worker with pid: 126417
+triggerer  | [2024-01-23T19:18:56.750+0530] {triggerer_job_runner.py:576} INFO - Triggerer's async thread was blocked for 0.43 seconds, likely by a badly-written trigger. Set PYTHONASYNCIODEBUG=1 to get more information on overrunning coroutines.
+scheduler  | [2024-01-23T19:18:56.890+0530] {manager.py:392} WARNING - Because we cannot use more than 1 thread (parsing_processes = 2) when using sqlite. So we set parallelism to 1.
+webserver  | /home/hdu/.local/lib/python3.8/site-packages/flask_limiter/extension.py:336 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+webserver  | [2024-01-23 19:19:03 +0530] [126400] [INFO] Starting gunicorn 21.2.0
+webserver  | [2024-01-23 19:19:03 +0530] [126400] [INFO] Listening at: http://0.0.0.0:8080 (126400)
+webserver  | [2024-01-23 19:19:03 +0530] [126400] [INFO] Using worker: sync
+webserver  | [2024-01-23 19:19:03 +0530] [126426] [INFO] Booting worker with pid: 126426
+webserver  | [2024-01-23 19:19:03 +0530] [126427] [INFO] Booting worker with pid: 126427
+webserver  | [2024-01-23 19:19:03 +0530] [126428] [INFO] Booting worker with pid: 126428
+webserver  | [2024-01-23 19:19:03 +0530] [126429] [INFO] Booting worker with pid: 126429
+webserver  | 127.0.0.1 - - [23/Jan/2024:19:19:04 +0530] "GET /home HTTP/1.1" 200 389902 "http://localhost:8080/configuration" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
+(X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
+webserver  | 127.0.0.1 - - [23/Jan/2024:19:20:24 +0530] "POST /last_dagruns HTTP/1.1" 200 2 "http://localhost:8080/home" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
+webserver  | 127.0.0.1 - - [23/Jan/2024:19:20:24 +0530] "POST /dag_stats HTTP/1.1" 200 8439 "http://localhost:8080/home" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
+webserver  | 127.0.0.1 - - [23/Jan/2024:19:20:24 +0530] "POST /task_stats HTTP/1.1" 200 27054 "http://localhost:8080/home" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
+triggerer  | [2024-01-23T19:20:56.387+0530] {triggerer_job_runner.py:481} INFO - 0 triggers currently running
+triggerer  | [2024-01-23T19:21:56.478+0530] {triggerer_job_runner.py:481} INFO - 0 triggers currently running
+triggerer  | [2024-01-23T19:22:56.557+0530] {triggerer_job_runner.py:481} INFO - 0 triggers currently running
+triggerer  | [2024-01-23T19:23:47.535+0530] {triggerer_job_runner.py:576} INFO - Triggerer's async thread was blocked for 0.28 seconds, likely by a badly-written trigger. Set PYTHONASYNCIODEBUG=1 to get more information on overrunning coroutines.
+triggerer  | [2024-01-23T19:23:56.652+0530] {triggerer_job_runner.py:481} INFO - 0 triggers currently running
+scheduler  | [2024-01-23T19:23:57.050+0530] {scheduler_job_runner.py:1619} INFO - Adopting or resetting orphaned tasks for active dag runs
+triggerer  | [2024-01-23T19:24:07.833+0530] {triggerer_job_runner.py:576} INFO - Triggerer's async thread was blocked for 0.31 seconds, likely by a badly-written trigger. Set PYTHONASYNCIODEBUG=1 to get more information on overrunning coroutines.
+triggerer  | [2024-01-23T19:24:25.265+0530] {triggerer_job_runner.py:576} INFO - Triggerer's async thread was blocked for 0.27 seconds, likely by a badly-written trigger. Set PYTHONASYNCIODEBUG=1 to get more information on overrunning coroutines.
+triggerer  | [2024-01-23T19:24:56.901+0530] {triggerer_job_runner.py:481} INFO - 0 triggers currently running
+triggerer  | [2024-01-23T19:25:06.357+0530] {triggerer_job_runner.py:576} INFO - Triggerer's async thread was blocked for 0.37 seconds, likely by a badly-written trigger. Set PYTHONASYNCIODEBUG=1 to get more information on overrunning coroutines.
+triggerer  | [2024-01-23T19:25:56.999+0530] {triggerer_job_runner.py:481} INFO - 0 triggers currently running
+
+
+------output ends--------
+
+--Access web UI
+http://localhost:8080/home
+
+--to disable default DAGs
+AIRFLOW_HOME/airflow.cfg 
+
+set AIRFLOW__CORE__LOAD__EXAMPLES: False
+
+restart airflow...
+
