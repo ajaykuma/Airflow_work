@@ -29,14 +29,14 @@ sudo apt install sqlite3
 --Install venv for virtual env (if we want to use it for our work)
 sudo apt-get install python3.8-venv
 
-hdu@mh3:~$ python -m venv my-venv
-hdu@mh3:~$ source my-venv/bin/activate
-(my-venv) hdu@mh3:~$ pwd
-/home/hdu
+student@mh3:~$ python -m venv my-venv
+student@mh3:~$ source my-venv/bin/activate
+(my-venv) student@mh3:~$ pwd
+/home/student
 
-(my-venv) hdu@mh3:~$ sudo apt install libpq-dev
+(my-venv) student@mh3:~$ sudo apt install libpq-dev
 
-(my-venv) hdu@mh3:~$ pip install 'apache-airflow[postgres]==2.8.1' \
+(my-venv) student@mh3:~$ pip install 'apache-airflow[postgres]==2.8.1' \
 >  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt"
 
 Commands:
@@ -45,7 +45,7 @@ airflow standalone
 airflow info
 airflow standalone
 
-(my-venv) hdu@mh3:~$ airflow -h
+(my-venv) student@mh3:~$ airflow -h
 Usage: airflow [-h] GROUP_OR_COMMAND ...
 
 [optional]
@@ -76,9 +76,12 @@ pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}
 --We can individually start scheduler, webserver etc or start all in one as a standalone
 
 --Initialize db
-(my-venv) hdu@mh3:~$ airflow db init
-/home/hdu/my-venv/lib/python3.8/site-packages/airflow/cli/commands/db_command.py:47 DeprecationWarning: `db init` is deprecated.  Use `db migrate` instead to migrate the db and/or airflow connections create-default-connections to create the default connections
-DB: sqlite:////home/hdu/airflow/airflow.db
+
+make sure, airflow.cfg in /home/xxxx/my-venv/airflow.cfg is edited to have load_examples=False
+
+(my-venv) student@mh3:~$ airflow db init
+/home/student/my-venv/lib/python3.8/site-packages/airflow/cli/commands/db_command.py:47 DeprecationWarning: `db init` is deprecated.  Use `db migrate` instead to migrate the db and/or airflow connections create-default-connections to create the default connections
+DB: sqlite:////home/student/airflow/airflow.db
 [2024-11-17T18:00:33.847+0100] {migration.py:216} INFO - Context impl SQLiteImpl.
 [2024-11-17T18:00:33.848+0100] {migration.py:219} INFO - Will assume non-transactional DDL.
 INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
@@ -90,7 +93,7 @@ Initialization done
 --Install postgres as that's what we want to use.
 Using sqlite3 restricts us in context of running multiple tasks.
 
-(my-venv) hdu@mh3:~$  sudo apt-get install postgresql postgresql-contrib
+(my-venv) student@mh3:~$  sudo apt-get install postgresql postgresql-contrib
 
 ..
 Success. You can now start the database server using:
@@ -101,7 +104,7 @@ Ver Cluster Port Status Owner    Data directory              Log file
 12  main    5432 down   postgres /var/lib/postgresql/12/main /var/log/postgresql/postgresql-12-main.log
 
 Connect to postgres..
-(my-venv) hdu@mh3:~$ sudo -i -u postgres
+(my-venv) student@mh3:~$ sudo -i -u postgres
 
 postgres@mh3:~$ psql
 psql (12.20 (Ubuntu 12.20-0ubuntu0.20.04.1))
@@ -117,17 +120,17 @@ GRANT ALL PRIVILEGES ON DATABASE airflow to airflow;
 
 Configure airflow to connect to postgres instead of default sqlite3
 
-(my-venv) hdu@mh3:~$ ls airflow
+(my-venv) student@mh3:~$ ls airflow
 airflow.cfg  airflow.db  logs
 
-(my-venv) hdu@mh3:~$ ls my-venv/
+(my-venv) student@mh3:~$ ls my-venv/
 bin  include  lib  lib64  pyvenv.cfg  share
 
 Edit airflow.cfg file to point to postgres..
-(my-venv) hdu@mh3:~$ sed -i 's#sqlite:////home/hdu/airflow/airflow.db#postgresql+psycopg2://airflow:airflow@localhost/airflow#g' /home/hdu/airflow/airflow.cfg 
+(my-venv) student@mh3:~$ sed -i 's#sqlite:////home/student/airflow/airflow.db#postgresql+psycopg2://airflow:airflow@localhost/airflow#g' /home/student/airflow/airflow.cfg 
 
 --to check conn details
-(my-venv) hdu@mh3:~$ grep sql_alchemy /home/hdu/airflow/airflow.cfg
+(my-venv) student@mh3:~$ grep sql_alchemy /home/student/airflow/airflow.cfg
 sql_alchemy_conn = postgresql+psycopg2://airflow:airflow@localhost/airflow
 # Example: sql_alchemy_engine_args = {"arg1": True}
 # sql_alchemy_engine_args = 
@@ -141,7 +144,7 @@ sql_alchemy_schema =
 # sql_alchemy_connect_args = 
 
 --check executor
-(my-venv) hdu@mh3:~$ grep executor /home/hdu/airflow/airflow.cfg
+(my-venv) student@mh3:~$ grep executor /home/student/airflow/airflow.cfg
 # The executor class that airflow should use. Choices include
 # full import path to the class when using a custom executor.
 executor = SequentialExecutor
@@ -153,9 +156,9 @@ executor = SequentialExecutor
 
 NOte** Tasks can only be executed sequentially
 --change it
-(my-venv) hdu@mh3:~$ sed -i 's#SequentialExecutor#LocalExecutor#g' /home/hdu/airflow/airflow.cfg
+(my-venv) student@mh3:~$ sed -i 's#SequentialExecutor#LocalExecutor#g' /home/student/airflow/airflow.cfg
 
-(my-venv) hdu@mh3:~$ grep executor /home/hdu/airflow/airflow.cfg
+(my-venv) student@mh3:~$ grep executor /home/student/airflow/airflow.cfg
 # The executor class that airflow should use. Choices include
 # full import path to the class when using a custom executor.
 executor = LocalExecutor
@@ -166,8 +169,8 @@ executor = LocalExecutor
 # the elements of the list (e.g: "scheduler,executor,dagrun").
 
 --initialize airflow again
-(my-venv) hdu@mh3:~$ airflow db init
-/home/hdu/my-venv/lib/python3.8/site-packages/airflow/cli/commands/db_command.py:47 DeprecationWarning: `db init` is deprecated.  Use `db migrate` instead to migrate the db and/or airflow connections create-default-connections to create the default connections
+(my-venv) student@mh3:~$ airflow db init
+/home/student/my-venv/lib/python3.8/site-packages/airflow/cli/commands/db_command.py:47 DeprecationWarning: `db init` is deprecated.  Use `db migrate` instead to migrate the db and/or airflow connections create-default-connections to create the default connections
 DB: postgresql+psycopg2://airflow:***@localhost/airflow
 [2024-11-18T09:45:30.216+0100] {migration.py:216} INFO - Context impl PostgresqlImpl.
 [2024-11-18T09:45:30.226+0100] {migration.py:219} INFO - Will assume transactional DDL.
@@ -181,9 +184,9 @@ Initialization done
 airflow users create -u airflow -f airflow -l airflow -r Admin -e airflow@gmail.com
 pswd: abcd@1234
 
-(my-venv) hdu@mh3:~$ airflow webserver &
+(my-venv) student@mh3:~$ airflow webserver &
 [1] 8170
-(my-venv) hdu@mh3:~$ [2024-11-18T09:48:21.666+0100] {configuration.py:2065} INFO - Creating new FAB webserver config file in: /home/hdu/airflow/webserver_config.py
+(my-venv) student@mh3:~$ [2024-11-18T09:48:21.666+0100] {configuration.py:2065} INFO - Creating new FAB webserver config file in: /home/student/airflow/webserver_config.py
   ____________       _____________
  ____    |__( )_________  __/__  /________      __
 ____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /
@@ -196,7 +199,7 @@ Timeout: 120
 Logfiles: - -
 Access Logformat: 
 =================================================================
-/home/hdu/my-venv/lib/python3.8/site-packages/flask_limiter/extension.py:336 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+/home/student/my-venv/lib/python3.8/site-packages/flask_limiter/extension.py:336 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
 [2024-11-18T09:48:27.589+0100] {override.py:1769} INFO - Created Permission View: can create on DAG Runs
 [2024-11-18T09:48:27.614+0100] {override.py:1820} INFO - Added Permission can create on DAG Runs to role Admin
 [2024-11-18T09:48:27.646+0100] {override.py:1769} INFO - Created Permission View: can read on DAG Runs
@@ -486,7 +489,7 @@ Access Logformat:
 [2024-11-18 09:48:37 +0100] [8180] [INFO] Booting worker with pid: 8180
 
 --run scheduler
-(my-venv) hdu@mh3:~$ airflow scheduler
+(my-venv) student@mh3:~$ airflow scheduler
   ____________       _____________
  ____    |__( )_________  __/__  /________      __
 ____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /
@@ -513,7 +516,7 @@ localhost:8080
 Starting...
 
 
-hdu@mh1:~$ airflow standalone
+student@mh1:~$ airflow standalone
 ------sample output-----
 standalone | Starting Airflow Standalone
 standalone | Checking database is initialized
@@ -521,14 +524,14 @@ INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
 INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
 WARNI [unusual_prefix_b640e0e884ae8145646e4eb0bed05093a1dabf36_example_local_kubernetes_executor] Could not import DAGs in example_local_kubernetes_executor.py
 Traceback (most recent call last):
-  File "/home/hdu/.local/lib/python3.8/site-packages/airflow/example_dags/example_local_kubernetes_executor.py", line 37, in <module>
+  File "/home/student/.local/lib/python3.8/site-packages/airflow/example_dags/example_local_kubernetes_executor.py", line 37, in <module>
     from kubernetes.client import models as k8s
 ModuleNotFoundError: No module named 'kubernetes'
 WARNI [unusual_prefix_b640e0e884ae8145646e4eb0bed05093a1dabf36_example_local_kubernetes_executor] Install Kubernetes dependencies with: pip install apache-airflow[cncf.kubernetes]
 WARNI [unusual_prefix_1607d6d6df7596b1233d110ba20cbc9d50977527_example_kubernetes_executor] The example_kubernetes_executor example DAG requires the kubernetes provider. Please install it with: pip install apache-airflow[cncf.kubernetes]
 WARNI [airflow.models.crypto] empty cryptography key - values will not be stored encrypted.
 standalone | Database ready
-/home/hdu/.local/lib/python3.8/site-packages/flask_limiter/extension.py:336 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+/home/student/.local/lib/python3.8/site-packages/flask_limiter/extension.py:336 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
 triggerer  | ____________       _____________
 triggerer  | ____    |__( )_________  __/__  /________      __
 triggerer  | ____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /
@@ -561,7 +564,7 @@ scheduler  | [2024-01-23 19:18:56 +0530] [126416] [INFO] Booting worker with pid
 scheduler  | [2024-01-23 19:18:56 +0530] [126417] [INFO] Booting worker with pid: 126417
 triggerer  | [2024-01-23T19:18:56.750+0530] {triggerer_job_runner.py:576} INFO - Triggerer's async thread was blocked for 0.43 seconds, likely by a badly-written trigger. Set PYTHONASYNCIODEBUG=1 to get more information on overrunning coroutines.
 scheduler  | [2024-01-23T19:18:56.890+0530] {manager.py:392} WARNING - Because we cannot use more than 1 thread (parsing_processes = 2) when using sqlite. So we set parallelism to 1.
-webserver  | /home/hdu/.local/lib/python3.8/site-packages/flask_limiter/extension.py:336 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+webserver  | /home/student/.local/lib/python3.8/site-packages/flask_limiter/extension.py:336 UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
 webserver  | [2024-01-23 19:19:03 +0530] [126400] [INFO] Starting gunicorn 21.2.0
 webserver  | [2024-01-23 19:19:03 +0530] [126400] [INFO] Listening at: http://0.0.0.0:8080 (126400)
 webserver  | [2024-01-23 19:19:03 +0530] [126400] [INFO] Using worker: sync
