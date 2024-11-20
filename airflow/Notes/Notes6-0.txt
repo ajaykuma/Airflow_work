@@ -49,6 +49,8 @@ datetime.timedelta object.
 Cron expression:
 5 fields= 15  14  1   	* 	*
          min  hr day month day(week)
+Note**Note: Use schedule_interval=None and not schedule_interval='None' when you don’t want to schedule your DAG.
+
 Presets:
 None : Dont schedule, use for exclusively "enternally triggered" DAGs
 @once: Schedule once and only once
