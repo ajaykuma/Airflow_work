@@ -127,10 +127,10 @@ airflow.cfg  airflow.db  logs
 bin  include  lib  lib64  pyvenv.cfg  share
 
 Edit airflow.cfg file to point to postgres..
-(my-venv) student@mh3:~$ sed -i 's#sqlite:////home/student/airflow/airflow.db#postgresql+psycopg2://airflow:airflow@localhost/airflow#g' /home/student/airflow/airflow.cfg 
+(my-venv) student@mh3:~$ sed -i 's#sqlite:////home/student/my-venv/airflow.db#postgresql+psycopg2://airflow:airflow@localhost/airflow#g' /home/student/my-venv/airflow.cfg 
 
 --to check conn details
-(my-venv) student@mh3:~$ grep sql_alchemy /home/student/airflow/airflow.cfg
+(my-venv) student@mh3:~$ grep sql_alchemy /home/student/my-venv/airflow.cfg
 sql_alchemy_conn = postgresql+psycopg2://airflow:airflow@localhost/airflow
 # Example: sql_alchemy_engine_args = {"arg1": True}
 # sql_alchemy_engine_args = 
@@ -144,7 +144,7 @@ sql_alchemy_schema =
 # sql_alchemy_connect_args = 
 
 --check executor
-(my-venv) student@mh3:~$ grep executor /home/student/airflow/airflow.cfg
+(my-venv) student@mh3:~$ grep executor /home/student/my-venv/airflow.cfg
 # The executor class that airflow should use. Choices include
 # full import path to the class when using a custom executor.
 executor = SequentialExecutor
@@ -156,9 +156,9 @@ executor = SequentialExecutor
 
 NOte** Tasks can only be executed sequentially
 --change it
-(my-venv) student@mh3:~$ sed -i 's#SequentialExecutor#LocalExecutor#g' /home/student/airflow/airflow.cfg
+(my-venv) student@mh3:~$ sed -i 's#SequentialExecutor#LocalExecutor#g' /home/student/my-venv/airflow.cfg
 
-(my-venv) student@mh3:~$ grep executor /home/student/airflow/airflow.cfg
+(my-venv) student@mh3:~$ grep executor /home/student/my-venv/airflow.cfg
 # The executor class that airflow should use. Choices include
 # full import path to the class when using a custom executor.
 executor = LocalExecutor
