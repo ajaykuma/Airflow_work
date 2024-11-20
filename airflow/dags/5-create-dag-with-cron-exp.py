@@ -14,7 +14,7 @@ default_args = {
 with DAG(
     dag_id = 'dag_with_cron_v0',
     default_args=default_args,
-    start_date=datetime(2024,1,26),
+    start_date=datetime(2024,11,20),
     schedule_interval='0 0 * * *'
     #schedule_interval='@daily'
 

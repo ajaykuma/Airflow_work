@@ -20,7 +20,7 @@ default_args = {
 	'sla': timedelta(seconds=30)}
 
 with DAG('sample_dag_sla',
-	start_date=datetime(2024,1,1),
+	start_date=datetime(2024,11,20),
 	default_args=default_args,
 	max_active_runs = 1,
 	schedule_interval=timedelta(minutes=2),

@@ -15,7 +15,7 @@ default_args = {
 with DAG(
     dag_id = 'dag_with_catchup_n_backfill_v0',
     default_args=default_args,
-    start_date=datetime(2024,1,15),
+    start_date=datetime(2024,11,19),
     schedule_interval='@daily',
     catchup=True
 

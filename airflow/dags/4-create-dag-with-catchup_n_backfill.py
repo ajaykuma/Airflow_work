@@ -14,7 +14,7 @@ default_args = {
 with DAG(
     dag_id = 'dag_with_cron_v0',
     default_args=default_args,
-    start_date=datetime(2024,1,1),
+    start_date=datetime(2024,11,20),
     schedule_interval='0 0 * * mon,wed,fri',
     #catchup=True
 
@@ -28,9 +28,9 @@ task1
 
 #testing backfill
 #set catchup=False
-#set start_date=datetime(2024,1,15)
+#set start_date=datetime(2024,11,20)
 #set schedule_interval='@daily'
 #airflow dags list
-#airflow dags backfill -s 2024-1-10 -e 2024-1-15 <dagid>
+#airflow dags backfill -s 2024-11-10 -e 2024-11-20 <dagid>
 
 

@@ -13,7 +13,7 @@ default_args = {
 @dag(dag_id = 'sample_dag_with_taskflow_api_v0',
     description = 'Testing sample dag with taskflow',
     default_args=default_args,
-    start_date=datetime(2024,1,28),schedule_interval='@daily')
+    start_date=datetime(2024,11,20),schedule_interval='@daily')
 
 #create 3 tasks
 

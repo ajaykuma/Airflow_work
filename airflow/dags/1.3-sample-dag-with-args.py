@@ -24,7 +24,7 @@ with DAG (
     dag_id = 'sample_dag_v1',
     description = 'Testing sample dag with args from file',
     default_args=default_args,
-    start_date=datetime(2024,1,15,2),
+    start_date=datetime(2024,11,20,2),
     schedule_interval='@daily'
 
 ) as dag:

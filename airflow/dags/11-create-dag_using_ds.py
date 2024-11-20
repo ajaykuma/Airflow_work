@@ -14,7 +14,7 @@ my_file = Dataset("/home/hdu/airflow/configs/sample.txt")
 with DAG(
     dag_id = "producer",
     schedule='@daily',
-    start_date=datetime(2024,1,29),
+    start_date=datetime(2024,11,20),
     catchup=False
 ):
 

@@ -25,7 +25,7 @@ with DAG (
     dag_id = 'sample_dag_v0',
     description = 'Testing sample dag',
     default_args=default_args,
-    start_date=datetime(2024,1,15,2),
+    start_date=datetime(2024,1,20,2),
     schedule_interval='@daily'
 
 ) as dag:
@@ -34,7 +34,7 @@ with DAG (
         bash_command='echo hello wrld, this is the first DAG '
     )
 
-    task1
+task1
 
 ---
 
@@ -44,7 +44,7 @@ restart airflow
 
 Now check if DAG shows up in UI.
 --We can unpause DAG and watch the status or for more info
-   --Browse > Task instances > success > look in logs
+   --Browse > Dag runs > success > look in logs
    --or look into logs in AIRFLOW_HOME/logs/<dag-id>
 
 from command line:
@@ -108,7 +108,7 @@ with DAG (
     dag_id = 'sample_dag_with_python_operator_v0',
     description = 'Testing sample dag with python operator',
     default_args=default_args,
-    start_date=datetime(2024,1,15,2),
+    start_date=datetime(2024,11,20,2),
     schedule_interval='@daily'
 
 ) as dag:

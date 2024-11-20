@@ -10,7 +10,7 @@ default_global_args = {
 'email': ['xyz@gmail.com'],
 'email_on_failure': True,
 'email_on_retry': True,
-'start_date': datetime(2024, 2, 19)
+'start_date': datetime(2024, 11, 19)
 }
 
 dag = DAG(

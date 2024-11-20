@@ -1,0 +1,455 @@
+Source code: https://github.com/apache/airflow
+
+Executors
+
+------------
+checking each executor in airflow/executors in the source code:
+executors
+├── __init__.py
+├── base_executor.py
+├── celery_executor.py
+├── celery_kubernetes_executor.py
+├── dask_executor.py
+├── debug_executor.py
+├── executor_constants.py
+├── executor_loader.py
+├── kubernetes_executor.py
+├── local_executor.py
+├── local_kubernetes_executor.py
+└── sequential_executor.py
+
+BaseExecutor:
+# airflow/executors/base_executor.py
+class BaseExecutor(LoggingMixin):
+
+    def __init__(self, parallelism: int = PARALLELISM):
+        super().__init__()
+        self.parallelism: int = parallelism
+        self.queued_tasks: OrderedDict[TaskInstanceKey, QueuedTaskInstanceType] = OrderedDict()
+        self.running: set[TaskInstanceKey] = set()
+        self.event_buffer: dict[TaskInstanceKey, EventBufferValueType] = {}
+        self.attempts: Counter[TaskInstanceKey] = Counter()
+
+As a basic executor, BaseExectuor communicates with executor types such as Celery, Kubernetes, Local, and Sequential. Here, parallelism is an option for how many jobs to run at once.
+The following main functions are implemented and used in other Executor types that inherits BaseExecutor:
+
+def start(self):
+
+    def sync(self) -> None:
+
+    def execute_async(
+        self,
+        key: TaskInstanceKey,
+        command: CommandType,
+        queue: str | None = None,
+        executor_config: Any | None = None,
+    ) -> None:
+    
+    def end(self) -> None:
+
+    def terminate(self):
+
+start starts the Executor
+sync is called periodically by the heartbeat
+execute_async executes a task asynchronously
+end is used when the caller submits a job and waits for it to be done
+terminate is called when a SIGTERM signal is received
+
+# airflow/executors/base_executor.py    
+    @staticmethod
+    def validate_airflow_tasks_run_command(command: list[str]) -> tuple[str | None, str | None]
+        if command[0:3] != ["airflow", "tasks", "run"]:
+            raise ValueError('The command must start with ["airflow", "tasks", "run"].')
+        if len(command) > 3 and "--help" not in command:
+            dag_id: str | None = None
+            task_id: str | None = None
+            for arg in command[3:]:
+                if not arg.startswith("--"):
+                    if dag_id is None:
+                        dag_id = arg
+                    else:
+                        task_id = arg
+                        break
+            return dag_id, task_id
+        return None, None
+
+validate_airflow_tasks_run_command verifies that the delivered command is an airflow command. If the command is validated as airflow command, dag_id and task_id are extracted and returned. This function is used in CeleryExecutor, KubernetesExecutor, LocalExecutor, and SequentialExecutor
+
+------------------------------------
+SequentialExecutor:
+# airflow/executors/sequential_executor.py
+class SequentialExecutor(BaseExecutor):
+
+    def __init__(self):
+        super().__init__()
+        self.commands_to_run = []
+
+    def execute_async(
+        self,
+        key: TaskInstanceKey,
+        command: CommandType,
+        queue: str | None = None,
+        executor_config: Any | None = None,
+    ) -> None:
+
+        self.validate_airflow_tasks_run_command(command)
+        self.commands_to_run.append((key, command))
+
+    def sync(self) -> None:
+        for key, command in self.commands_to_run:
+            self.log.info("Executing command: %s", command)
+
+            try:
+                subprocess.check_call(command, close_fds=True)
+                self.change_state(key, State.SUCCESS)
+            except subprocess.CalledProcessError as e:
+                self.change_state(key, State.FAILED)
+                self.log.error("Failed to execute task %s.", str(e))
+
+        self.commands_to_run = []
+
+SequentialExecutor executes only one task at a time. It is the only executor that can use sqlite as a backend. (sqlite does not allow concurrent access)
+
+execute_async : A task is added to the queue called commands_to_run.
+sync : It creates and executes subprocesses while sequentially running through the commands_to_run.
+
+---------------------------------
+LocalExecutor:
+# airflow/executors/local_executor.py
+class LocalExecutor(BaseExecutor):
+
+    def __init__(self, parallelism: int = PARALLELISM):
+        super().__init__(parallelism=parallelism)
+        if self.parallelism < 0:
+            raise AirflowException("parallelism must be bigger than or equal to 0")
+        self.manager: SyncManager | None = None
+        self.result_queue: Queue[TaskInstanceStateType] | None = None
+        self.workers: list[QueuedLocalWorker] = []
+        self.workers_used: int = 0
+        self.workers_active: int = 0
+        self.impl: None | (LocalExecutor.UnlimitedParallelism | LocalExecutor.LimitedParallelism) = None
+
+LocalExecutor runs tasks in parallel locally. It uses Python multiprocessing library.
+def start(self) -> None:
+        # ...
+        self.result_queue = self.manager.Queue()
+        self.workers = []
+        self.workers_used = 0
+        self.workers_active = 0
+        self.impl = (
+            LocalExecutor.UnlimitedParallelism(self)
+            if self.parallelism == 0
+            else LocalExecutor.LimitedParallelism(self)
+        )
+        self.impl.start()
+
+    def execute_async(
+        self,
+        key: TaskInstanceKey,
+        command: CommandType,
+        queue: str | None = None,
+        executor_config: Any | None = None,
+    ) -> None:
+        # -- implemented: check self.impl
+        self.validate_airflow_tasks_run_command(command)
+        self.impl.execute_async(key=key, command=command, queue=queue, executor_config=executor_config)
+
+    def sync(self) -> None:
+        # -- implemented: check self.impl
+        self.impl.sync()
+
+    def end(self) -> None:
+        # -- implemented: check self.impl and manager
+        self.impl.end()
+        self.manager.shutdown()
+
+self.impl above can be divided into two types. When creating an instance, if parallelism = 0, UnLimitedParallelism is applied, otherwise LimitedParallelism is applied.
+Each major function is implemented independently.
+class UnlimitedParallelism:
+        def __init__(self, executor: LocalExecutor):
+            self.executor: LocalExecutor = executor
+
+        def start(self) -> None:
+            self.executor.workers_used = 0
+            self.executor.workers_active = 0
+
+        def execute_async(
+            self,
+            key: TaskInstanceKey, 
+            command: CommandType,
+            queue: str | None = None,
+            executor_config: Any | None = None,
+        ) -> None:
+            # -- implemented: check self.executor.result_queue 
+            local_worker = LocalWorker(self.executor.result_queue, key=key, command=command)
+            self.executor.workers_used += 1
+            self.executor.workers_active += 1
+            local_worker.start()
+
+        def sync(self) -> None:
+            # -- implemented: check self.executor.result_queue 
+            while not self.executor.result_queue.empty():
+                results = self.executor.result_queue.get()
+                self.executor.change_state(*results)
+                self.executor.workers_active -= 1
+
+        def end(self) -> None:
+            while self.executor.workers_active > 0:
+                self.executor.sync()
+
+start initializes workers_used and workers_active of the Executor object.
+Whenever execute_async is called, a LocalWorker instance is created and executed. LocalWorker inherits from multiprocessing.Process. multiprocessing.Process is executed by forking a process.
+Every time sync is called, it checks whether the result_queue is empty, and decrements workers_active by one every time the task ends.
+When end is executed, if workers_active is greater than 0, sync is continuously executed until it becomes 0.
+
+class LimitedParallelism:
+        def __init__(self, executor: LocalExecutor):
+            self.executor: LocalExecutor = executor
+            self.queue: Queue[ExecutorWorkType] | None = None
+
+        def start(self) -> None:
+            if not self.executor.manager:
+                raise AirflowException(NOT_STARTED_MESSAGE)
+            self.queue = self.executor.manager.Queue()
+            if not self.executor.result_queue:
+                raise AirflowException(NOT_STARTED_MESSAGE)
+            self.executor.workers = [
+                QueuedLocalWorker(self.queue, self.executor.result_queue)
+                for _ in range(self.executor.parallelism)
+            ]
+
+            self.executor.workers_used = len(self.executor.workers)
+
+            for worker in self.executor.workers:
+                worker.start()
+
+        def execute_async(
+            self,
+            key: TaskInstanceKey,
+            command: CommandType,
+            queue: str | None = None,
+            executor_config: Any | None = None,
+        ) -> None:
+
+            if not self.queue:
+                raise AirflowException(NOT_STARTED_MESSAGE)
+            self.queue.put((key, command))
+
+        def sync(self):
+            while True:
+                try:
+                    results = self.executor.result_queue.get_nowait()
+                    try:
+                        self.executor.change_state(*results)
+                    finally:
+                        self.executor.result_queue.task_done()
+                except Empty:
+                    break
+
+        def end(self):
+            for _ in self.executor.workers:
+                self.queue.put((None, None))
+
+            self.queue.join()
+            self.executor.sync()
+
+When creating an executor, set QueuedLocalWorker according to the value set in parallelism and starts each worker. It uses queue to limit the number of executions.
+execute_sync sends the task key and command to the queue.
+sync keeps waiting for the task to be done by checking result_queue.
+
+-------------------------------
+CeleryExecutor:
+# airflow/executors/celery_executor.py
+class CeleryExecutor(BaseExecutor):
+
+    def __init__(self):
+        super().__init__()
+
+        self._sync_parallelism = conf.getint("celery", "SYNC_PARALLELISM")
+        if self._sync_parallelism == 0:
+            self._sync_parallelism = max(1, cpu_count() - 1)
+        self.bulk_state_fetcher = BulkStateFetcher(self._sync_parallelism)
+        self.tasks = {}
+        self.stalled_task_timeouts: dict[TaskInstanceKey, datetime.datetime] = {}
+        self.stalled_task_timeout = datetime.timedelta(
+            seconds=conf.getint("celery", "stalled_task_timeout", fallback=0)
+        )
+        self.adopted_task_timeouts: dict[TaskInstanceKey, datetime.datetime] = {}
+        self.task_adoption_timeout = (
+            datetime.timedelta(seconds=conf.getint("celery", "task_adoption_timeout", fallback=600))
+            or self.stalled_task_timeout
+        )
+        self.task_publish_retries: Counter[TaskInstanceKey] = Counter()
+        self.task_publish_max_retries = conf.getint("celery", "task_publish_max_retries", fallback=3)
+
+CeleryExecutor is recommended for production use. It enables to run a task on multiple worker nodes. To start the celery worker, you must run the airflow celery worker beforehand.
+
+A Celery instance is created based on the predefined configuraion:
+# airflow/executors/celery_executor.py
+if conf.has_option("celery", "celery_config_options"):
+    celery_configuration = conf.getimport("celery", "celery_config_options")
+else:
+    celery_configuration = DEFAULT_CELERY_CONFIG
+
+app = Celery(conf.get("celery", "CELERY_APP_NAME"), config_source=celery_configuration)
+
+    def sync(self) -> None:
+        # -- implemented: check self.tasks
+        self.update_all_task_states()
+        self._check_for_timedout_adopted_tasks()
+        self._check_for_stalled_tasks()
+
+sync updates the status of all tasks and checks the status.
+---------------------------------
+# airflow/executors/celery_executor.py
+class CeleryExecutor(BaseExecutor):
+
+    def _process_tasks(self, task_tuples: list[TaskTuple]) -> None:
+        task_tuples_to_send = [task_tuple[:3] + (execute_command,) for task_tuple in task_tuples]
+        first_task = next(t[3] for t in task_tuples_to_send)
+
+        cached_celery_backend = first_task.backend
+
+        key_and_async_results = self._send_tasks_to_celery(task_tuples_to_send)
+        self.log.debug("Sent all tasks.")
+
+        for key, _, result in key_and_async_results:
+            
+            # -- if result is not None
+                self.update_task_state(key, result.state, getattr(result, "info", None))
+
+
+# airflow/executors/base_executor.py
+class BaseExecutor(LoggingMixin):
+
+    def trigger_tasks(self, open_slots: int) -> None:
+        
+        sorted_queue = self.order_queued_tasks_by_priority()
+        task_tuples = []
+        # -- implemented: In queued_tasks, add to task_tuples if not included in self.running
+        if task_tuples:
+            self._process_tasks(task_tuples)
+
+_process_tasks, which appear to execute (process) tasks, are executed in the trigger_tasks of the inheriting object BaseExecutor. _send_tasks_to_celery is executed internally in _process_task.
+
+class CeleryExecutor(BaseExecutor):
+
+    def _send_tasks_to_celery(self, task_tuples_to_send: list[TaskInstanceInCelery]): 
+        if len(task_tuples_to_send) == 1 or self._sync_parallelism == 1:
+            return list(map(send_task_to_executor, task_tuples_to_send))
+
+        # Use chunks instead of a work queue to reduce context switching
+        # since tasks are roughly uniform in size
+        chunksize = self._num_tasks_per_send_process(len(task_tuples_to_send))
+        num_processes = min(len(task_tuples_to_send), self._sync_parallelism)
+
+        with ProcessPoolExecutor(max_workers=num_processes) as send_pool:
+            key_and_async_results = list(
+                send_pool.map(send_task_to_executor, task_tuples_to_send, chunksize=chunksize)
+            )
+        return key_and_async_results
+
+Tasks are sent to executors in parallel with task_tuples as an argument to send_task_to_executor. send_task_to_executor seems to run the Celery Task via an apply_async call to execute tasks
+
+def send_task_to_executor(
+    task_tuple: TaskInstanceInCelery,
+) -> tuple[TaskInstanceKey, CommandType, AsyncResult | ExceptionWithTraceback]:
+    
+    key, command, queue, task_to_run = task_tuple
+    try:
+        with timeout(seconds=OPERATION_TIMEOUT):
+            result = task_to_run.apply_async(args=[command], queue=queue)
+    except Exception as e:
+        exception_traceback = f"Celery Task ID: {key}\n{traceback.format_exc()}"
+        result = ExceptionWithTraceback(e, exception_traceback)
+
+    return key, command, result
+
+The process of running celery worker with command line is implemented in airflow/cli/commands/celery_command.py.
+
+Airflow Celery workers are executed through the function named worker below.
+
+# airflow/cli/commands/celery_command.py
+from airflow.executors.celery_executor import app as celery_app
+
+WORKER_PROCESS_NAME = "worker"
+
+@cli_utils.action_cli
+def worker(args):
+    # -- implemented: Disable connection pool so that celery worker does not hold an unnecessary db connection 
+
+    # -- implemented: Setup locations
+    pid_file_path, stdout, stderr, log_file = setup_locations(
+        process=WORKER_PROCESS_NAME,
+        pid=args.pid,
+        stdout=args.stdout,
+        stderr=args.stderr,
+        log=args.log_file,
+    )
+
+    if hasattr(celery_app.backend, "ResultSession"):
+        # -- implemented: Pre-create the database tables now, otherwise SQLA via Celery has a
+        # race condition where one of the subprocesses can die with "Table
+        # already exists" error, because SQLA checks for which tables exist,
+        # then issues a CREATE TABLE, rather than doing CREATE TABLE IF NOT EXISTS
+
+    # -- implemented: celery logging setup
+
+    # Setup Celery worker
+    options = [
+        "worker",
+        "-O",
+        "fair",
+        "--queues",
+        args.queues,
+        "--concurrency",
+        args.concurrency,
+        "--hostname",
+        args.celery_hostname,
+        "--loglevel",
+        celery_log_level,
+        "--pidfile",
+        pid_file_path,
+    ]
+    if autoscale:
+        options.extend(["--autoscale", autoscale])
+    if args.without_mingle:
+        options.append("--without-mingle")
+    if args.without_gossip:
+        options.append("--without-gossip")
+
+    if conf.has_option("celery", "pool"):
+        pool = conf.get("celery", "pool")
+        options.extend(["--pool", pool])
+        
+        maybe_patch_concurrency(["-P", pool])
+
+    if args.daemon:
+        # Run Celery worker as daemon
+        handle = setup_logging(log_file)
+
+        with open(stdout, "a") as stdout_handle, open(stderr, "a") as stderr_handle:
+            if args.umask:
+                umask = args.umask
+            else:
+                umask = conf.get("celery", "worker_umask", fallback=settings.DAEMON_UMASK)
+
+            stdout_handle.truncate(0)
+            stderr_handle.truncate(0)
+
+            daemon_context = daemon.DaemonContext(
+                files_preserve=[handle],
+                umask=int(umask, 8),
+                stdout=stdout_handle,
+                stderr=stderr_handle,
+            )
+            with daemon_context, _serve_logs(skip_serve_logs):
+                celery_app.worker_main(options)
+
+    else:
+        # Run Celery worker in the same process
+        with _serve_logs(skip_serve_logs):
+            celery_app.worker_main(options)
+
+When you execute airflow celery worker Celery workers, which run tasks, are setup.
+

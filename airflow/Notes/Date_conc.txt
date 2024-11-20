@@ -1,0 +1,69 @@
+Understanding start_date and execution_date
+-----------------------
+Start_date:
+Say we finish our dag at 15:00 and we want it to run regularly everyday at midnight.
+
+--code---
+import datetime as dt
+from airflow import DAG
+
+dag = DAG(
+  dag_id="sample_dag",
+  schedule_interval="@daily",
+  start_date=dt.datetime(2024, 11, 20),
+)
+-------
+When will dag> tasks run?
+Airflow starts running tasks for a given interval at the end of the interval itself, 
+so it will not start its first run until after 11:59 pm on 20-11-2024 or midnight 
+on the following day (21 11 2024).
+
+if you want to ingest data from the 20-11-2024 (and before), you will need to wait until the end of the interval (daily) for the data source to have all of the data available from the day before the ingestion starts.
+
+If you want your DAG to run today (20 nov 2024), do this:
+start_date=dt.datetime(2021, 11, 29)
+By default, Airflow will start any unexecuted DAG with a past start_date. So unless you want to have unnecessary additional runs, do not put your start_date in the past. This behaviour can be disabled by setting catchup=False.
+
+---code--
+dag = DAG(
+  dag_id="sample_dag",
+  schedule_interval="@daily",
+  start_date=dt.datetime(2024, 11, 19),
+  catchup=False,
+)
+---------
+
+Can we automate start_date as today ie 20-11-2024
+First of all, your today() is not at midnight. It could be at 13:45:32. 
+Airflow strongly recommend against using dynamic start_date. The reason being, as stated above, that Airflow executes the DAG after start_date + interval (daily). Therefore, if start_date is a callable, it will be re-evaluated continuously, moving along with time. The start_date + interval would forever stay in the future.
+
+Execution_date: (Nowadays, we just call it logical_date or ds for short)
+--this can be referenced within airflow task
+
+---code-------
+dag = DAG(
+  dag_id="sample_dag",
+  schedule_interval="@daily",
+  start_date=dt.datetime(2024, 11, 20),
+)
+
+def _print_execution_date(ds):
+  print(f"The execution date of this flow is {ds}")
+
+print_dag = PythonOperator(
+  task_id='print_task',
+  python_callable=_print_execution_date,
+  dag=dag,
+)
+--------------
+
+what date will be printed out at the first run?
+ By definition, Airflow’s logical date points to the start of the interval, not at the moment when the DAG is actually executed. Hence, the correct answer is still “2024-11-20”.
+
+Scheduled DAGs in Airflow always have a date interval, and tasks are run at the end of it. 
+While both start_date and execution_date (or logical_date) point to the beginning of the interval, 
+start_date will be constant for all the runs as defined in the DAG definition. 
+The execution_date, on the other hand, is passed as a parameter to the tasks, with a different value every time the DAG is executed.
+
+--be careful with using execution_date or time,when creating dependencies.
+
