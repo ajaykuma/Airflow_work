@@ -34,7 +34,7 @@ with DAG (
         bash_command='echo hello wrld, this is the first DAG '
     )
 
-task1
+    task1
 
 ---
 
@@ -42,15 +42,19 @@ copy this into AIRFLOW_HOME/dags/
 
 restart airflow
 
+Setting in airflow.cfg > dags_are_paused_at_creation = True
+[for programmatically unpausing a specific pause or using rest api, see below]
 Now check if DAG shows up in UI.
---We can unpause DAG and watch the status or for more info
-   --Browse > Dag runs > success > look in logs
+--We can unpause DAG and trigger the dag 
+  --watch the status or for more info
+   --Browse > Dag runs > click on dag_id > click on graph tab or click on grid>graph
+     --now click on each task and explore options (code,logs,xcom)
    --or look into logs in AIRFLOW_HOME/logs/<dag-id>
 
 from command line:
 airflow dags list
-pip install graphviz
-airflow dags show sample_dag_v5
+--pip install graphviz
+airflow dags show sample_dag_v0
 ==============
 
 #EX2:
@@ -122,7 +126,7 @@ with DAG (
 -----------------
 
 Optional :
---we can pass paramters to python functions 
+--we can pass parameters to python functions 
 def greet(name,age):
     print(f"Hello world, my name is {name},"
           f" and I am {age} years old")
@@ -137,6 +141,49 @@ and update in task
 
 --------------------
 
+#Programmatically unpause a DAG (automatically)
+
+--code---
+import airflow.settings
+from airflow.models import DagModel
+def unpause_dag(dag):
+    """
+    A way to programatically unpause a DAG.
+    :param dag: DAG object
+    :return: dag.is_paused is now False
+    """
+    session = airflow.settings.Session()
+    try:
+        qry = session.query(DagModel).filter(DagModel.dag_id == dag.dag_id)
+        d = qry.first()
+        d.is_paused = False
+        session.commit()
+    except:
+        session.rollback()
+    finally:
+        session.close()
+
+----
+From command line:
+hdu@mh1:~$ airflow dags pause sample_dag_v2
+/home/hdu/.local/lib/python3.8/site-packages/airflow/utils/dot_renderer.py:28 UserWarning: Could not import graphviz. Rendering graph to the graphical format will not be possible.
+Dag: sample_dag_v2, paused: True
+
+------------
+
+OR
+
+using in the python operator of any dag to pause and unpause the dags programmatically
+from airflow.models import DagModel
+dag_id = "dag_name"
+dag = DagModel.get_dagmodel(dag_id)
+dag.set_is_paused(is_paused=False)
+
+--to check
+dag.is_paused()
+
+More info:
+https://airflow.apache.org/docs/apache-airflow/stable/stable-rest-api-ref.html#operation/get_dag
 
 
 
