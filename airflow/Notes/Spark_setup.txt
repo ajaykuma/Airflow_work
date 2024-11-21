@@ -24,7 +24,7 @@ vi /usr/local/spark/conf/spark-defaults.conf
 --add the below line
 spark.sql.warehouse.dir            /home/student/mywh
 
-vi /usr/local/spark/conf/spark-defaults.conf
+vi /usr/local/spark/conf/workers
 --add the below line
 localhost
 
