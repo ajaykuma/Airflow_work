@@ -1,0 +1,233 @@
+#Working with sensor
+------------------
+ExternalTaskSensor
+TimeDeltaSensor
+TimeSensorAsync
+TimeDeltaSensorAsync
+
+--------------------------------
+ExternalTaskSensor:
+
+In Apache Airflow, the ExternalTaskSensor is a sensor operator that waits for a task 
+to complete in a different DAG. 
+This can be useful in scenarios where you have dependencies across different DAGs.
+
+example:
+---DAG1----
+from airflow import DAG
+from datetime import datetime, timedelta
+from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
+
+default_args = {
+
+    'owner': 'hdu',
+    'retries': 5,
+    'retry_delay': timedelta(minutes=5)
+}
+
+def greet(age,ti):
+    name = ti.xcom_pull(task_ids='get_name')
+    print(f"Hello world, my name is {name},"
+          f" and I am {age} years old")
+
+def get_name():
+    return 'John'
+
+with DAG (
+
+    dag_id = 'sample_dag1_for_cross_dag_chk_v0',
+    description = 'Testing sample dag with python operator',
+    default_args=default_args,
+    #start_date=datetime(2024,11,20),
+    #schedule_interval='@daily'
+    schedule_interval=None
+
+) as dag:
+    task1 = PythonOperator(
+        task_id ='greet',
+        python_callable=greet,
+        op_kwargs={'age': 25}
+    )
+
+    task2 = PythonOperator(
+        task_id ='get_name',
+        python_callable=get_name,
+    )
+
+    task2 >> task1
+
+---------
+
+------DAG2-----
+#depends on DAG1,i.e
+sample_dag2_for_cross_dag_chk_v1 <depends on DAG > >>> sample_dag1_for_cross_dag_chk_v0
+                                                 & on its task >>> greet
+
+from airflow import DAG
+from datetime import datetime, timedelta
+from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
+from airflow.sensors.external_task import ExternalTaskSensor
+
+default_args = {
+
+    'owner': 'hdu',
+    'retries': 5,
+    'retry_delay': timedelta(minutes=5)
+}
+
+dag = DAG(
+
+    dag_id = 'sample_dag2_for_cross_dag_chk_v1',
+    description = 'Testing sample dag with python operator',
+    default_args=default_args,
+    start_date=datetime(2024,11,20),
+    schedule_interval='@daily'
+
+) 
+
+wait_for_other_dag_task = ExternalTaskSensor(
+    task_id='task2_sample_dag2_for_cross_dag_chk_v1',
+    external_dag_id='sample_dag1_for_cross_dag_chk_v0',
+    external_task_id='greet',
+    #mode='reschedule',  # sensor frees up worker when criteria is not met
+    #timeout=600,  # timeout in seconds
+    # start_date=datetime(2024,11,20,2),
+    # schedule_interval='@daily'
+    execution_date_fn=lambda dt: dt,
+    #execution_delta=timedelta(minutes=1),
+    dag=dag
+    )
+
+check_compl = BashOperator(
+    task_id ='fnl_tsk',
+    bash_command='echo cross dependency validation done ',
+    dag=dag
+    )
+
+wait_for_other_dag_task >> check_compl
+----------------
+
+=============
+TimeDeltaSensor:
+
+The TimeDeltaSensor in Apache Airflow is a sensor that waits for a certain delta 
+of time to pass before succeeding. 
+It's a simple, but useful sensor for certain types of workflows.
+The TimeDeltaSensor takes a delta parameter which is the amount of time to wait before the task
+ succeeds. This is a datetime.timedelta object. 
+Make sure that the value you're passing to delta is correct.
+
+example:
+from datetime import timedelta
+from airflow import DAG
+from airflow.operators.sensors import TimeDeltaSensor
+from airflow.utils.dates import days_ago
+
+with DAG('my_dag', start_date=days_ago(2)) as dag:
+    wait_5_minutes = TimeDeltaSensor(
+        task_id='wait_5_minutes',
+        delta=timedelta(minutes=5),
+    )
+====================
+
+Triggerer:
+The Triggerer is a new component introduced in Apache Airflow 2.2.0. 
+It's designed to handle long-running tasks like TimeSensorAsync more efficiently. 
+The Triggerer relies on the triggerer_instances and triggerer_timeout configuration 
+options in the airflow.cfg file
+[scheduler]
+triggerer_instances = 2
+triggerer_timeout = 300
+The 'Triggerer' is a component in Apache Airflow that is responsible for triggering tasks 
+and managing their execution. It is a key part of the scheduling and execution 
+process in Airflow.
+
+===============
+
+TimeSensorAsync:
+
+from datetime import timedelta,datetime,time
+from airflow.decorators import dag, task
+from airflow.sensors.time_sensor import TimeSensorAsync
+from airflow.operators.time_sensor_async import TimeSensorAsync
+from airflow.utils.dates import days_ago
+
+# default_args = {
+
+#     'owner': 'hdu',
+#     'retries': 5,
+#     'retry_delay': timedelta(minutes=5)
+# }
+
+@dag(dag_id = 'sample_dag_with_timeSensor_v0',
+        schedule_interval='@daily', 
+     start_date=days_ago(5), 
+     catchup=False)
+
+def my_dag():
+    wait = TimeSensorAsync(
+        task_id='wait',
+        target_time=time(hour=12, minute=45), 
+        mode='reschedule',
+    )
+
+    @task
+    def the_task(wait):
+        print("Task executed.")
+
+    the_task(wait)
+
+dag = my_dag()
+
+--------------
+TimeDeltaSensorAsync:
+
+Understanding the TimeDeltaSensorAsync
+The TimeDeltaSensorAsync is a sensor in Apache Airflow that waits for a certain time 
+delta to pass before succeeding. It is an asynchronous sensor, meaning it does not
+ block a worker slot while it is waiting.
+
+example:
+from datetime import timedelta
+from airflow.decorators import dag, task
+from airflow.sensors.time_delta import TimeDeltaSensorAsync
+from airflow.utils.dates import days_ago
+
+@dag(schedule_interval='@daily', start_date=days_ago(2), catchup=False)
+def my_dag():
+    wait = TimeDeltaSensorAsync(
+        task_id='wait',
+        delta=timedelta(minutes=30),
+        mode='reschedule',
+    )
+
+    @task
+    def the_task():
+        print("Task executed.")
+
+    the_task(wait)
+
+dag = my_dag()
+
+#waits for 30 minutes before the task the_task is executed.
+----------------
+from airflow.models import DAG
+from datetime import datetime
+from airflow.sensors.filesystem import FileSensor
+
+
+with DAG('dag_sensor', schedule_interval='@daily', start_date=days_ago(2), catchup=False, default_args=default_args) as dag:
+
+	waiting_for_file = FileSensor(
+	     task_id = 'waiting_for_file',
+	     poke_interval=30,
+	     timeout=60 * 5,
+	     mode='reschedule',
+	     soft_fail=False
+	)
+..to be updated
+
+
+

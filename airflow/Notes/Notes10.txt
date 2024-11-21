@@ -1,0 +1,200 @@
+MultiNode Architecture
+------------------
+Components:
+Operating System: Red Hat Enterprise Linux release 8.8
+Python Version: Python 3.9.16
+PIP: 22.0.4 for pip3.9, Python3.9
+Apache Airflow Version: 2.7.3
+Backend DB: PostgreSQL 15.4
+Executor: Celery
+Celery Backend: RabbitMQ 3.12.10 Erlang 26.1.2
+
+----------------
+--Install Required Libraries
+
+yum install wget yum-utils make gcc openssl-devel bzip2-devel libffi-devel zlib-devel -y
+yum install libpq-devel
+yum install sqlite-devel
+
+--Install Python 3.9.0
+wget https://www.python.org/ftp/python/3.9.16/Python-3.9.16.tgz
+tar xzf Python-3.9.16.tgz
+cd Python-3.9.16
+./configure --enable-optimizations
+make altinstall
+
+--Install Airflow
+pip3.9 install importlib-metadata
+pip3.9 install apache-airflow==2.7.3
+pip3.9 install apache-airflow[celery]==2.7.3
+pip3.9 install apache-airflow[rabbitmq]==2.7.3
+pip3.9 install psycopg2
+
+--Add airflow user
+useradd -m -d /app1/airflow airflow
+passwd airflow
+usermod -G wheel airflow
+mkdir -p /app1/airflow /app1/airflow_logs /app1/airflow/dags /app1/airflow/plugins /run/airflow
+
+Note: The above steps need to be executed on one node (master), 
+except for user creation, which needs to be done on every node with a shared home directory as /app1/airflow.
+
+--Configuraing Airflow
+export AIRFLOW_HOME=/app1/airflow/
+airflow initdb
+
+--Setup PostgreSQL DB (if using PostgreSQL)
+sudo -u postgres psql
+CREATE USER airflow PASSWORD 'airflow';
+CREATE DATABASE airflow;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO airflow;
+GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
+
+--update airflow.cfg
+--[core] section
+
+executor = CeleryExecutor
+sql_alchemy_conn = postgresql+psycopg2://airflow:airflow@{hostname}/airflow
+load_examples = False
+
+--[logging] section
+base_log_folder = /app1/airflow_logs/
+dag_processor_manager_log_location = /app1/airflow/_logs/dag_processor_manager/dag_processor_manager.log
+
+--[webserver] section
+base_url = http://{hostname}:8080
+expose_config = False
+
+--[celery] section
+broker_url = pyamqp://airflow:airflow@{hostname}:5672/
+result_backend = db+postgresql://airflow:airflow@{hostname}/airflow
+
+--[scheduler] section
+
+child_process_log_directory = /app1/airflow_logs/scheduler
+catchup_by_default = False
+
+--Reinitialize Airflow
+airflow db init
+
+--Add an Airflow Admin User (Run the below step only on node1):
+airflow users create -e XYZ@airtel.com -f Airflow -l Admin -u admin -p admin_123 -r Admin
+
+--Controlling Airflow Services
+--Airflow can be integrated with systemd-based systems for easier daemon management.
+
+--Systemd Service Files
+--Create systemd service files for the Airflow webserver, scheduler, and worker.
+
+--For Webserver (airflow-webserver.service):
+
+[Unit]
+Description=Airflow webserver daemon
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/airflow
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/airflow webserver -D --access-logfile=/app1/airflow_logs/airflow/webserver_access.log --error-logfile=/app1/airflow_logs/airflow/webserver_error.log
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=on-failure
+RestartSec=42s
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
+--For Scheduler (airflow-scheduler.service):
+[Unit]
+Description=Airflow scheduler daemon
+After=network.target
+
+
+[Service]
+EnvironmentFile=/etc/sysconfig/airflow
+PIDFile=/run/airflow/scheduler.pid
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/airflow scheduler -D
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=on-failure
+RestartSec=42s
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
+--For Worker (airflow-celeryworker.service):
+[Unit]
+Description=Airflow celery worker daemon
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/airflow
+PIDFile=/run/airflow/worker.pid
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/airflow celery worker -D
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=on-failure
+RestartSec=42s
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
+--Systemd Commands
+Use systemd commands to start, stop, and restart the Airflow webserver, scheduler, and worker.
+systemctl start airflow
+systemctl stop airflow
+systemctl restart airflow
+
+Airflow UI
+Access the Airflow UI at: http://{HOSTNAME}:8080/admin/
+
+Start Flower (Optional)
+Flower is a web UI for monitoring Celery workers.
+
+nohup airflow flower >> ~/airflow/logs/flower.logs &
+
+Access the Flower UI at: http://{HOSTNAME}:5555/
+
+Service file for Flower (Optional):
+
+[Unit]
+Description=Airflow flower daemon
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/airflow
+PIDFile=/run/airflow/flower.pid
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/airflow celery flower -D
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=on-failure
+RestartSec=42s
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
+Note: In our setup, we run the webserver, scheduler, and Flower on one node, and only the worker on the remaining nodes.
+
+Note**
+About Celery Executor
+As of Airflow 2.7.0, you need to install the celery provider package to use this executor.
+CeleryExecutor is one of the ways you can scale out the number of workers. For this to work, 
+you need to setup a Celery backend (RabbitMQ, Redis, Redis Sentinel …) and change your airflow.cfg to point 
+the executor parameter to CeleryExecutor and provide the related Celery settings.
+
+https://docs.celeryq.dev/en/latest/getting-started/

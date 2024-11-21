@@ -1,0 +1,3 @@
+#to use airflow with spark
+--remember to create connection, 
+master = local [which could be yarn or spark master]
