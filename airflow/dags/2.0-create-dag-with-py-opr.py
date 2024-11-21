@@ -12,7 +12,7 @@ default_args = {
 
     'owner': 'hdu',
     'retries': 5,
-    'retry_delay': timedelta(minutes=5)
+    'retry_delay': timedelta(minutes=1)
 }
 
 def greet(ti):
@@ -54,4 +54,3 @@ with DAG (
      python_callable=get_age)
 
     [task2,task3] >> task1
-

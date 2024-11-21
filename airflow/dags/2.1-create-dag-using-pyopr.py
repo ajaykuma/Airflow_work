@@ -1,4 +1,5 @@
 #Refer Notes/Notes4.txt for more details
+
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
@@ -8,7 +9,7 @@ default_args = {
 
     'owner': 'hdu',
     'retries': 5,
-    'retry_delay': timedelta(minutes=5)
+    'retry_delay': timedelta(minutes=1)
 }
 
 def greet(name,age):
@@ -36,4 +37,15 @@ with DAG (
         bash_command='echo hello wrld, this is the second task of sample DAG '
     )
 
-    task1 >> task2
+    task3 = BashOperator(
+        task_id = 'get_packages',
+        bash_command='pip install pandas numpy --upgrade pip'
+    )
+
+    task4 = BashOperator(
+        task_id = 'list_packages',
+        bash_command='pip list > requirements.txt'
+    )
+
+    task1 >> [task2,task3]
+    task3 >> task4
