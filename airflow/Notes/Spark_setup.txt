@@ -1,0 +1,28 @@
+exit 
+cd /usr/local
+sudo tar -xvf /home/student/Downloads/spark-3.2.0-bin-hadoop3.2.tgz
+sudo ln -s spark-3.2.0-bin-hadoop3.2 spark
+sudo chown -R student:student spark*
+
+
+spark setup
+------------
+now update .bashrc
+
+
+export SPARK_HOME=/usr/local/spark
+export PATH=$PATH:$SPARK_HOME/bin
+export LD_LIBRARY_PATH=$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH
+export PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.2-src.zip:$SPARK_HOME/python/lib/pyspark.zip:$PYTHONPATH
+
+vi /usr/local/spark/conf/spark-defaults.conf
+spark.sql.warehouse.dir            /home/hdu/mywh
+
+vi /usr/local/spark/conf/spark-defaults.conf
+localhost
+
+now test spark..from command line
+pyspark
+
+
+
