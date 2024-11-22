@@ -40,6 +40,7 @@ pip install mysqlclient (if mysqlclient installed already, reinstall it)
 
 from venv
 as non-root
+sudo apt install python3.8-dev
 pip install apache-airflow-providers-mysql
 
 <optional>check if installation was fine
