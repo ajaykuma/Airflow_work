@@ -1,11 +1,148 @@
 #Working with sensor
 ------------------
 ExternalTaskSensor
-TimeDeltaSensor
+TimeSensor
 TimeSensorAsync
+TimeDeltaSensor
 TimeDeltaSensorAsync
 
 --------------------------------
+Triggerer:
+The Triggerer is a new component introduced in Apache Airflow 2.2.0. 
+It's designed to handle long-running tasks like TimeSensorAsync more efficiently. 
+The Triggerer relies on the triggerer_instances and triggerer_timeout configuration 
+options in the airflow.cfg file
+[scheduler]
+triggerer_instances = 2
+triggerer_timeout = 300
+The 'Triggerer' is a component in Apache Airflow that is responsible for triggering tasks 
+and managing their execution. It is a key part of the scheduling and execution 
+process in Airflow.
+
+===============
+TimeDeltaSensor:
+
+The TimeDeltaSensor in Apache Airflow is a sensor that waits for a certain delta 
+of time to pass before succeeding. 
+It's a simple, but useful sensor for certain types of workflows.
+The TimeDeltaSensor takes a delta parameter which is the amount of time to wait before the task
+ succeeds. This is a datetime.timedelta object. 
+Make sure that the value you're passing to delta is correct.
+
+example:
+from datetime import timedelta
+from airflow import DAG
+from airflow.operators.sensors import TimeDeltaSensor
+from airflow.utils.dates import days_ago
+
+with DAG('my_dag', start_date=days_ago(2)) as dag:
+    wait_5_minutes = TimeDeltaSensor(
+        task_id='wait_5_minutes',
+        delta=timedelta(minutes=5),
+    )
+====================
+TimeDeltaSensorAsync:
+
+Understanding the TimeDeltaSensorAsync
+The TimeDeltaSensorAsync is a sensor in Apache Airflow that waits for a certain time 
+delta to pass before succeeding. It is an asynchronous sensor, meaning it does not
+ block a worker slot while it is waiting.
+
+example:
+from datetime import timedelta
+from airflow.decorators import dag, task
+from airflow.sensors.time_delta import TimeDeltaSensorAsync
+from airflow.utils.dates import days_ago
+
+@dag(schedule_interval='@daily', start_date=days_ago(2), catchup=False)
+def my_dag():
+    wait = TimeDeltaSensorAsync(
+        task_id='wait',
+        delta=timedelta(minutes=30),
+        mode='reschedule',
+    )
+
+    @task
+    def the_task():
+        print("Task executed.")
+
+    the_task(wait)
+
+dag = my_dag()
+
+#waits for 30 minutes before the task the_task is executed.
+====================
+TimeSensorAsync:
+
+from datetime import timedelta,datetime,time
+from airflow.decorators import dag, task
+from airflow.sensors.time_sensor import TimeSensorAsync
+from airflow.operators.time_sensor_async import TimeSensorAsync
+from airflow.utils.dates import days_ago
+
+# default_args = {
+
+#     'owner': 'hdu',
+#     'retries': 5,
+#     'retry_delay': timedelta(minutes=5)
+# }
+
+@dag(dag_id = 'sample_dag_with_timeSensor_v0',
+        schedule_interval='@daily', 
+     start_date=days_ago(5), 
+     catchup=False)
+
+def my_dag():
+    wait = TimeSensorAsync(
+        task_id='wait',
+        target_time=time(hour=12, minute=45), 
+        mode='reschedule',
+    )
+
+    @task
+    def the_task(wait):
+        print("Task executed.")
+
+    the_task(wait)
+
+dag = my_dag()
+
+=====================
+
+TimeSensor:
+
+from datetime import timedelta,datetime,time
+from airflow.decorators import dag, task
+from airflow.sensors.time_sensor import TimeSensor
+from airflow.utils.dates import days_ago
+
+# default_args = {
+
+#     'owner': 'hdu',
+#     'retries': 5,
+#     'retry_delay': timedelta(minutes=5)
+# }
+
+@dag(dag_id = 'sample_dag_with_timeSensor_v0',
+        schedule_interval='@daily', 
+     start_date=days_ago(5), 
+     catchup=False)
+
+def my_dag():
+    wait = TimeSensor(
+        task_id='wait',
+        target_time=time(hour=12, minute=45), 
+        mode='reschedule',
+    )
+
+    @task
+    def the_task(wait):
+        print("Task executed.")
+
+    the_task(wait)
+
+dag = my_dag()
+=====================
 ExternalTaskSensor:
 
 In Apache Airflow, the ExternalTaskSensor is a sensor operator that waits for a task 
@@ -109,110 +246,7 @@ check_compl = BashOperator(
 wait_for_other_dag_task >> check_compl
 ----------------
 
-=============
-TimeDeltaSensor:
-
-The TimeDeltaSensor in Apache Airflow is a sensor that waits for a certain delta 
-of time to pass before succeeding. 
-It's a simple, but useful sensor for certain types of workflows.
-The TimeDeltaSensor takes a delta parameter which is the amount of time to wait before the task
- succeeds. This is a datetime.timedelta object. 
-Make sure that the value you're passing to delta is correct.
-
-example:
-from datetime import timedelta
-from airflow import DAG
-from airflow.operators.sensors import TimeDeltaSensor
-from airflow.utils.dates import days_ago
-
-with DAG('my_dag', start_date=days_ago(2)) as dag:
-    wait_5_minutes = TimeDeltaSensor(
-        task_id='wait_5_minutes',
-        delta=timedelta(minutes=5),
-    )
-====================
-
-Triggerer:
-The Triggerer is a new component introduced in Apache Airflow 2.2.0. 
-It's designed to handle long-running tasks like TimeSensorAsync more efficiently. 
-The Triggerer relies on the triggerer_instances and triggerer_timeout configuration 
-options in the airflow.cfg file
-[scheduler]
-triggerer_instances = 2
-triggerer_timeout = 300
-The 'Triggerer' is a component in Apache Airflow that is responsible for triggering tasks 
-and managing their execution. It is a key part of the scheduling and execution 
-process in Airflow.
-
-===============
-
-TimeSensorAsync:
-
-from datetime import timedelta,datetime,time
-from airflow.decorators import dag, task
-from airflow.sensors.time_sensor import TimeSensorAsync
-from airflow.operators.time_sensor_async import TimeSensorAsync
-from airflow.utils.dates import days_ago
-
-# default_args = {
-
-#     'owner': 'hdu',
-#     'retries': 5,
-#     'retry_delay': timedelta(minutes=5)
-# }
-
-@dag(dag_id = 'sample_dag_with_timeSensor_v0',
-        schedule_interval='@daily', 
-     start_date=days_ago(5), 
-     catchup=False)
-
-def my_dag():
-    wait = TimeSensorAsync(
-        task_id='wait',
-        target_time=time(hour=12, minute=45), 
-        mode='reschedule',
-    )
-
-    @task
-    def the_task(wait):
-        print("Task executed.")
-
-    the_task(wait)
-
-dag = my_dag()
-
 --------------
-TimeDeltaSensorAsync:
-
-Understanding the TimeDeltaSensorAsync
-The TimeDeltaSensorAsync is a sensor in Apache Airflow that waits for a certain time 
-delta to pass before succeeding. It is an asynchronous sensor, meaning it does not
- block a worker slot while it is waiting.
-
-example:
-from datetime import timedelta
-from airflow.decorators import dag, task
-from airflow.sensors.time_delta import TimeDeltaSensorAsync
-from airflow.utils.dates import days_ago
-
-@dag(schedule_interval='@daily', start_date=days_ago(2), catchup=False)
-def my_dag():
-    wait = TimeDeltaSensorAsync(
-        task_id='wait',
-        delta=timedelta(minutes=30),
-        mode='reschedule',
-    )
-
-    @task
-    def the_task():
-        print("Task executed.")
-
-    the_task(wait)
-
-dag = my_dag()
-
-#waits for 30 minutes before the task the_task is executed.
-----------------
 from airflow.models import DAG
 from datetime import datetime
 from airflow.sensors.filesystem import FileSensor

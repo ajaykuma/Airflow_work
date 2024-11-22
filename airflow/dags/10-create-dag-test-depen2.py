@@ -1,9 +1,8 @@
 # refer Notes/Notes9.txt for more details
-#will need a triggerer
-
+#without need of trigerrer
 from datetime import timedelta
 from airflow.decorators import dag, task
-from airflow.sensors.time_delta import TimeDeltaSensorAsync
+from airflow.sensors.time_delta import TimeDeltaSensor
 from airflow.utils.dates import days_ago
 
 # default_args = {
@@ -13,15 +12,15 @@ from airflow.utils.dates import days_ago
 #     'retry_delay': timedelta(minutes=5)
 # }
 
-@dag(dag_id = 'sample_dag_with_timedeltaSensor_v1',
+@dag(dag_id = 'sample_dag_with_timedeltaSensor_v0',
         schedule_interval='@daily', 
      start_date=days_ago(5), 
      catchup=False)
 
 def my_dag():
-    wait = TimeDeltaSensorAsync(
+    wait = TimeDeltaSensor(
         task_id='wait',
-        delta=timedelta(hours=15),
+        delta=timedelta(minutes=15),
         mode='reschedule',
     )
 
