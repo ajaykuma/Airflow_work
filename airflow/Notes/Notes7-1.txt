@@ -73,12 +73,6 @@ def mysql_to_file(ds_nodash,next_ds_nodash):
     logging.info("saved output from tbl into a file: %s", f"/home/hdu/airflow/dags/sql/sampleout_{ds_nodash}.csv")
 
 ===================
-#Working airflow aws s3 sensor
-----------------------
-Sensor operator: a special type of operator which
-waits for something to occur.
 
-ex: unknown time of data availability
-    exact time when a file exists..
 
 

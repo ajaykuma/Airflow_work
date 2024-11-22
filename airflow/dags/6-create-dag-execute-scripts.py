@@ -3,6 +3,8 @@ import airflow
 from datetime import timedelta 
 from airflow import DAG 
 from airflow.operators.mysql_operator import MySqlOperator
+from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 #from airflow.providers.apache.hive.operators.hive import HiveOperator 
 from airflow.utils.dates import days_ago
 
@@ -15,7 +17,7 @@ default_args = {
     # 'email_on_failure': False, 
     # 'email_on_retry': False, 
     #'retries': 1, 
-    'retry_delay': timedelta(minutes=5), }
+    'retry_delay': timedelta(minutes=1), }
 
 dag_exec_scripts = DAG( 
     dag_id='dag_exec_scripts_demo_v0', 
@@ -26,20 +28,26 @@ dag_exec_scripts = DAG(
     dagrun_timeout=timedelta(minutes=60), 
     description='executing the sql scripts', )
 
-# clnup_table = MySqlOperator(sql = "sql/deletetbl.sql",
-#                             task_id="clnuptable_task", 
-#                              mysql_conn_id="airflow_db", 
-#                              dag=dag_exec_scripts)
-
+"""task1 = BashOperator(
+        task_id ='get_packages',
+        bash_command='pip install pandas numpy '
+        dag=dag_exec_scripts
+    )"""
+            
 create_table = MySqlOperator( sql="sql/createdb.sql", 
                              task_id="createtable_task", 
-                             mysql_conn_id="airflow_db", 
-                             dag=dag_exec_scripts ) 
+                             mysql_conn_id="mysql_default", 
+                             dag=dag_exec_scripts )
+
+clnup_table = MySqlOperator(sql = "sql/deletetbl.sql",
+                             task_id="clnuptable_task", 
+                              mysql_conn_id="mysql_default", 
+                              dag=dag_exec_scripts)
 
 load_data = MySqlOperator( sql="sql/loadscr.sql", 
                           task_id="load_data_task", 
-                          mysql_conn_id="airflow_db", 
+                          mysql_conn_id="mysql_default", 
                           dag=dag_exec_scripts ) 
 
-#clnup_table >> 
-create_table >> load_data
+
+create_table >> clnup_table >> load_data

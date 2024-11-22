@@ -9,7 +9,3 @@ VALUES (100,"Steven","King",'1987-06-17',"AD_PRES",24000.00,0.00,0,90),
 (107,"Diana","Lorentz",'1987-06-24',"IT_PROG",4200.00,0.00,103,60), 
 (108,"Nancy","Greenberg",'1987-06-25',"FI_MGR",12000.00,0.00,101,100), 
 (109,"Daniel","Faviet",'1987-06-26',"FI_ACCOUNT",9000.00,0.00,108,100); 
-#SELECT DISTINCT (job_id) from airflow.employees ;
-#SELECT COUNT( DISTINCT (job_id)) from airflow.employees;
-#SELECT MAX(salary) from airflow.employees;
-#SELECT MIN(salary) from airflow.employees;
