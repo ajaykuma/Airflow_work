@@ -3,7 +3,7 @@ which are designed to interact with external systems and databases.
 The MySQLHook is a key component that allows Airflow to connect to a MySQL database, 
 enabling the execution of SQL commands and the transfer of data.
 -----------------------------------------------
---to be one on Host machine
+--to be done on Host machine
 #connecting to external stores/DBs
 Say mysql
 #on Ubuntu, install and setup MYSQL
@@ -20,6 +20,8 @@ mysql
 >GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
 >GRANT ALL PRIVILEGES ON *.* TO 'hdu'@'localhost' WITH GRANT OPTION;
 
+exit;
+
 mysql -u hdu -p
 >create database airflow;
 >GRANT ALL PRIVILEGES ON airflow.* TO 'root'@'localhost' WITH GRANT OPTION;
@@ -34,12 +36,24 @@ exit;
 
 sudo apt-get install libmysqlclient-dev
 sudo pip install mysqlclient (if mysqlclient installed already, reinstall it)
+
+as non-root
 pip install apache-airflow-providers-mysql
 
 <optional>check if installation was fine
 pip freeze | grep apache-airflow-providers-mysql
 
 if airflow already running, restart 
+ps aux | grep webserver
+
+--check for process ID and 'sudo kill -9 <processid>
+
+ps aux | grep scheduler
+--check for process ID and 'sudo kill -9 <processid>
+
+Restart airflow
+nohup airflow webserver &
+nohup airflow scheduler &
 
 in UI > connections > DB
 and now check if mysql connection type shows up.
@@ -55,7 +69,7 @@ It is part of the Airflow Providers for MySQL package, which must be installed s
 --if using Hive then install ( pip install apache-airflow-providers-apache-hive)
 
 Before creating the dag file, create SQL directory to add SQL scripts 
-sudo mkdir -p /airflow/dags/sql
+sudo mkdir -p dags/sql
 
 
 --createdb.sql
@@ -81,6 +95,8 @@ SELECT COUNT( DISTINCT (job_id)) from airflow.employees;
 SELECT MAX(salary) from airflow.employees;
 SELECT MIN(salary) from airflow.employees;
 
+---
+DAG
 ---
 import airflow 
 from datetime import timedelta 
