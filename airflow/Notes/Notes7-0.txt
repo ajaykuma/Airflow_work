@@ -34,9 +34,11 @@ exit;
 #we can also do pip install steps as a part of workflow in tasks.
 #good to do it using tasks as part of workflow ,so dependencies are always taken care of.
 
+from non venv
 sudo apt-get install libmysqlclient-dev
-sudo pip install mysqlclient (if mysqlclient installed already, reinstall it)
+pip install mysqlclient (if mysqlclient installed already, reinstall it)
 
+from venv
 as non-root
 pip install apache-airflow-providers-mysql
 
