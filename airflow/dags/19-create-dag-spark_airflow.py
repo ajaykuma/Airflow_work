@@ -1,3 +1,13 @@
+#for first run, 
+    # comment import of SparkSubmitOperator 
+    # comment task3
+    # comment task2 >> task3 dependency
+#once providers are installed
+    # uncomment SparkSubmitOperator
+    # comment task1
+    # uncomment task3
+    # comment task1 >> task2 dependency and keep task2 >> task3 dependency active
+
 import airflow
 from airflow import DAG
 #pip install apache-airflow-providers-apache-spark pyspark
@@ -5,7 +15,7 @@ from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+#from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 import json
 
 
@@ -32,11 +42,11 @@ with DAG (
         schedule='@daily'
 
 )as dag:
-        #only for first time to get providers
-    #task1 = BashOperator(
-    #    task_id ='get_providers',
-    #    bash_command='pip install apache-airflow-providers-apache-spark pyspark '
-    #)
+    #only for first time to get providers
+    task1 = BashOperator(
+        task_id ='get_providers',
+        bash_command='pip install apache-airflow-providers-apache-spark pyspark '
+    )
 
     task2 = PythonOperator(
         task_id = 'pyspark_wrk',
@@ -44,7 +54,7 @@ with DAG (
 
     )
     
-    task3 = SparkSubmitOperator(
+    """task3 = SparkSubmitOperator(
         task_id = 'pyspark_job',
         conn_id = 'spark_conn',
         application = 'my-venv/dags/spaApp1.py',
@@ -56,10 +66,11 @@ with DAG (
         name='sample_spark_airf_appl',
        
 
-    )
+    )"""
 
     #uncomment if first time
-    #task1.set_downstream(task2)
-    task2.set_downstream(task3)
+    task1.set_downstream(task2)
+    #uncomment when second run or running spaApp1.py application, also make sure task1 >> task2 is commented
+    #task2.set_downstream(task3)
 
 

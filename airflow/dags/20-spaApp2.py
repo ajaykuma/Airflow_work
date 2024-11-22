@@ -3,7 +3,7 @@ analysis_job.py
 ~~~~~~~~~~
 
     $SPARK_HOME/bin/spark-submit \
-    --master spark://localhost:7077 \
+    --master local \
     --py-files packages.zip \
     --files configs/config.json \
     jobs/analysis_job.py

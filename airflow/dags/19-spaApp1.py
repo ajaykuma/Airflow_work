@@ -29,7 +29,7 @@ def spafunc():
     .option('header','true') \
     .option('inferSchema','true') \
     .load("file:///home/hdu/Downloads/Bank_full.csv")
-    data.write.mode('overwrite').save('/home/hdu/my-venv/sampleoutpt')
+    #data.write.mode('overwrite').save('/home/hdu/my-venv/sampleoutpt')
     return data.show(2)
 
 spafunc()

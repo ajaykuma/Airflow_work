@@ -38,6 +38,7 @@ with DAG (
     #    bash_command='pip install apache-airflow-providers-apache-spark pyspark '
     #)
 
+    #only for first run to get packages
     task1 = BashOperator(
         task_id ='get_packages',
         bash_command='pip install pandas numpy '
@@ -71,5 +72,7 @@ with DAG (
 
     task1.set_downstream(task2)
     task2.set_downstream(task3)
+
+    #we can split the spaApp2.py application into multiple tasks for parallelism.
 
 
