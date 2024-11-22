@@ -1,4 +1,9 @@
-
+Apache Airflow's integration with MySQL is facilitated through the use of hooks and connections, 
+which are designed to interact with external systems and databases. 
+The MySQLHook is a key component that allows Airflow to connect to a MySQL database, 
+enabling the execution of SQL commands and the transfer of data.
+-----------------------------------------------
+--to be one on Host machine
 #connecting to external stores/DBs
 Say mysql
 #on Ubuntu, install and setup MYSQL
@@ -21,12 +26,11 @@ mysql -u hdu -p
 >GRANT ALL PRIVILEGES ON airflow.* TO 'hdu'@'localhost' WITH GRANT OPTION;
 
 exit;
-Apache Airflow's integration with MySQL is facilitated through the use of hooks and connections, 
-which are designed to interact with external systems and databases. 
-The MySQLHook is a key component that allows Airflow to connect to a MySQL database, 
-enabling the execution of SQL commands and the transfer of data.
-
+-------------
 #Setup mysql connector
+
+#we can also do pip install steps as a part of workflow in tasks.
+#good to do it using tasks as part of workflow ,so dependencies are always taken care of.
 
 sudo apt-get install libmysqlclient-dev
 sudo pip install mysqlclient (if mysqlclient installed already, reinstall it)
