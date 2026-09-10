@@ -1,0 +1,187 @@
+# Ubuntu Airflow Setup Instructions (No Virtual Environment)
+---------------------------------------------------------------
+
+# Purpose
+# This guide installs Apache Airflow 2.8.1 on a standalone Ubuntu instance
+# without creating or activating a Python virtual environment.
+#
+# IMPORTANT:
+# - This guide intentionally does NOT use venv.
+# - Airflow will therefore be installed into the user's Python environment.
+# - For production systems or when running multiple Python applications,
+#   a virtual environment is generally recommended.
+
+# 1. Ubuntu instance prerequisites
+# ---------------------------------
+
+# Update Ubuntu packages
+sudo apt update
+
+# Install Python, pip and useful packages
+sudo apt install -y python3 python3-pip python3-dev build-essential
+
+# Install Java 11
+sudo apt install -y openjdk-11-jdk
+
+# Optional/helpful packages
+sudo apt install -y git vim openssh-server wget
+
+# Check Python version
+python3 --version
+
+# Check Java version
+java -version
+
+# 2. Update .bashrc
+# -----------------
+
+# Open .bashrc
+vim ~/.bashrc
+
+# Add the following lines:
+alias python=python3
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+export PATH=$PATH:$JAVA_HOME/bin
+export PATH=$PATH:$HOME/.local/bin
+
+# Reload the shell configuration
+source ~/.bashrc
+
+# Verify
+python --version
+java -version
+
+# 3. Airflow installation
+# -----------------------
+
+# Set the Airflow home directory
+export AIRFLOW_HOME=~/airflow
+
+# Make it persistent by adding this to ~/.bashrc:
+export AIRFLOW_HOME=~/airflow
+
+# Reload .bashrc if required
+source ~/.bashrc
+
+# Airflow version to install
+AIRFLOW_VERSION=2.8.1
+
+# Extract the installed Python major/minor version
+# Airflow 2.8.1 supports specific Python versions.
+# If the installed Python version is not supported, set PYTHON_VERSION
+# manually to a supported version before creating the constraint URL.
+PYTHON_VERSION="$(python --version | cut -d " " -f 2 | cut -d "." -f 1-2)"
+
+# Check the values
+echo $AIRFLOW_VERSION
+echo $PYTHON_VERSION
+
+# Create the Airflow constraints URL
+CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
+
+# Check the constraints URL
+echo $CONSTRAINT_URL
+
+# Install Airflow using the constraints file
+# Do NOT use sudo pip here.
+python3 -m pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
+
+# Verify the installation
+airflow version
+airflow info
+
+# If the airflow command is not found, make sure ~/.local/bin is in PATH:
+export PATH=$PATH:$HOME/.local/bin
+source ~/.bashrc
+
+# 4. Start Airflow as a standalone instance
+# ------------------------------------------
+
+# Start Airflow
+airflow standalone
+
+# Airflow standalone will:
+# - initialize the Airflow metadata database
+# - use SQLite by default
+# - start the scheduler
+# - start the triggerer
+# - start the webserver
+#
+# IMPORTANT:
+# This standalone setup is intended for a simple/demo/single-instance setup.
+# It is NOT the same as configuring PostgreSQL with LocalExecutor.
+
+# 5. Access the Airflow Web UI
+# ----------------------------
+
+# On the Ubuntu machine:
+http://localhost:8080/home
+
+# If Ubuntu is a remote server, localhost refers to that server.
+# Access the UI remotely using the server hostname/IP and make sure
+# the required network/firewall port is allowed.
+
+# 6. Disable example DAGs
+# -----------------------
+
+# Stop Airflow before changing the configuration if required.
+
+# Airflow configuration file:
+$AIRFLOW_HOME/airflow.cfg
+
+# In airflow.cfg, set:
+load_examples = False
+
+# Alternatively, the corresponding environment variable is:
+export AIRFLOW__CORE__LOAD_EXAMPLES=False
+
+# Restart Airflow after changing the configuration.
+
+# 7. Useful commands
+# ------------------
+
+# Display Airflow help
+airflow -h
+
+# Display Airflow version
+airflow version
+
+# Display Airflow information
+airflow info
+
+# Start Airflow standalone
+airflow standalone
+
+# 8. Troubleshooting
+# -------------------
+
+# If "airflow: command not found" is displayed:
+export PATH=$PATH:$HOME/.local/bin
+source ~/.bashrc
+airflow version
+
+# If the Python version is unsupported:
+python3 --version
+
+# Set PYTHON_VERSION manually to a Python version supported by
+# Airflow 2.8.1, then recreate CONSTRAINT_URL and run the installation again.
+
+# If airflow standalone does not start:
+airflow info
+
+# Check that AIRFLOW_HOME is set correctly:
+echo $AIRFLOW_HOME
+
+# Check that the configuration file exists:
+ls -l $AIRFLOW_HOME/airflow.cfg
+
+# 9. Important note about this no-venv setup
+# ------------------------------------------
+
+# Because this installation does not use a virtual environment:
+# - Airflow dependencies are installed into the user's Python environment.
+# - Package upgrades for other Python applications can affect Airflow.
+# - Multiple Airflow versions are harder to manage on the same machine.
+#
+# For a simple standalone learning/demo machine, this setup is convenient.
+# For production, isolated environments are recommended.

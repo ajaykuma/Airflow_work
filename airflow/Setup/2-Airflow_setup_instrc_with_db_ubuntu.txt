@@ -1,0 +1,743 @@
+# Apache Airflow 2.8.1 Setup with PostgreSQL and LocalExecutor
+# Ubuntu / Python 3.8 or 3.9
+# ------------------------------------------------------------
+# Purpose:
+# Install Apache Airflow 2.8.1 in a Python virtual environment,
+# configure PostgreSQL as the metadata database, use LocalExecutor,
+# create an Airflow Admin user, and start the scheduler/webserver.
+#
+# IMPORTANT:
+# - Run commands as the appropriate Ubuntu user.
+# - Commands requiring root privileges use sudo.
+# - Replace <...> placeholders with your own values.
+# - This is a lab/development setup, not a production deployment.
+# - Keep PostgreSQL credentials and Airflow UI credentials separate.
+
+
+============================================================
+1. UBUNTU SYSTEM PREPARATION
+============================================================
+
+# Update Ubuntu package information
+sudo apt update
+
+# Check Python version
+python3 --version
+
+# Install Java 11
+sudo apt install -y openjdk-11-jdk
+
+# Verify Java
+java -version
+
+# Set Java environment variables for the current user.
+# Add these to ~/.bashrc if required:
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+export PATH=$PATH:$JAVA_HOME/bin
+
+# Refresh shell configuration
+source ~/.bashrc
+
+# Verify
+ echo $JAVA_HOME
+java -version
+
+
+============================================================
+2. INSTALL UBUNTU PACKAGES
+============================================================
+
+# Useful packages for the lab
+sudo apt install -y git vim openssh-server wget curl python3-pip
+
+# PostgreSQL client/development libraries
+sudo apt install -y libpq-dev
+
+# SQLite client for initial/local testing if required
+sudo apt install -y sqlite3
+
+# Python virtual-environment support
+# Use the package matching the Python version installed.
+# Example for Python 3.8:
+sudo apt install -y python3.8-venv
+
+# Verify virtual-environment support
+python3 -m venv --help
+
+
+============================================================
+3. CREATE AND ACTIVATE PYTHON VIRTUAL ENVIRONMENT
+============================================================
+
+# Go to the user's home directory
+cd /home/hdu
+
+# Create the virtual environment
+python3 -m venv my-venv
+
+# Activate the virtual environment
+source /home/hdu/my-venv/bin/activate
+
+# Verify
+python --version
+which python
+
+# Upgrade Python packaging tools
+python -m pip install --upgrade pip setuptools wheel
+
+
+============================================================
+4. INSTALL APACHE AIRFLOW 2.8.1
+============================================================
+
+# IMPORTANT:
+# Use the constraint file matching the Python version.
+
+# Python 3.8:
+pip install "apache-airflow[postgres]==2.8.1" \
+  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt"
+
+# Python 3.9:
+# pip install "apache-airflow[postgres]==2.8.1" \
+#   --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.9.txt"
+
+# Verify installation
+airflow version
+airflow info
+
+
+============================================================
+5. CONFIGURE AIRFLOW HOME
+============================================================
+
+# Set AIRFLOW_HOME
+export AIRFLOW_HOME=/home/hdu/airflow
+
+# Make it persistent for the current user
+echo 'export AIRFLOW_HOME=/home/hdu/airflow' >> ~/.bashrc
+
+source ~/.bashrc
+
+# Verify
+echo $AIRFLOW_HOME
+airflow info | grep -E "airflow_home|airflow_config"
+
+
+============================================================
+6. INITIAL AIRFLOW TEST
+============================================================
+
+# Optional: test the installation and allow Airflow to create
+# its default configuration files.
+airflow standalone
+
+# If it starts successfully, stop it with Ctrl+C.
+
+# Do not run airflow standalone together with separately started
+# scheduler/webserver processes. Standalone starts its own components.
+
+
+============================================================
+7. CONFIGURE AIRFLOW CONFIGURATION FILE
+============================================================
+
+# The main configuration file should normally be:
+# /home/hdu/airflow/airflow.cfg
+
+# Check its location
+airflow info | grep airflow_config
+
+# Edit airflow.cfg
+vi /home/hdu/airflow/airflow.cfg
+
+# Disable example DAGs:
+load_examples = False
+
+
+============================================================
+8. INSTALL AND CONFIGURE POSTGRESQL ON UBUNTU
+============================================================
+
+# Install PostgreSQL and useful extensions
+sudo apt-get install -y postgresql postgresql-contrib
+
+# Check PostgreSQL cluster status
+pg_lsclusters
+
+# If the PostgreSQL cluster is down, start it.
+# Replace <version> with the installed PostgreSQL version.
+sudo pg_ctlcluster <version> main start
+
+# Verify PostgreSQL is listening on port 5432
+sudo ss -lntp | grep 5432
+
+
+============================================================
+9. CREATE AIRFLOW DATABASE AND POSTGRESQL USER
+============================================================
+
+# Open PostgreSQL as the postgres administrator
+sudo -i -u postgres
+
+# Start psql
+psql
+
+# Run inside psql:
+CREATE DATABASE airflow;
+CREATE USER airflow WITH PASSWORD '<POSTGRES_AIRFLOW_PASSWORD>';
+GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
+
+# Exit psql and return to the normal user shell
+\q
+exit
+
+
+============================================================
+10. CONFIGURE POSTGRESQL AUTHENTICATION
+============================================================
+
+# Find pg_hba.conf
+sudo -u postgres psql -c "SHOW hba_file;"
+
+# On Ubuntu, pg_hba.conf is normally under:
+# /etc/postgresql/<version>/main/pg_hba.conf
+
+# Back up the configuration file
+sudo cp /etc/postgresql/<version>/main/pg_hba.conf \
+        /etc/postgresql/<version>/main/pg_hba.conf.backup
+
+# Inspect active rules
+sudo grep -v '^#' /etc/postgresql/<version>/main/pg_hba.conf | grep -v '^$'
+
+# Edit the file
+sudo vi /etc/postgresql/<version>/main/pg_hba.conf
+
+# Recommended local lab configuration:
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# Keep local Unix-socket access for the postgres administrator:
+local   all             all                                     peer
+
+# Use password authentication for TCP localhost connections:
+host    all             all             127.0.0.1/32            scram-sha-256
+host    all             all             ::1/128                 scram-sha-256
+
+# Keep the replication rules generated by PostgreSQL unless you
+# have a specific reason to change them.
+
+# Reload PostgreSQL after changing pg_hba.conf
+sudo systemctl reload postgresql
+
+
+============================================================
+11. TEST POSTGRESQL BEFORE INVOLVING AIRFLOW
+============================================================
+
+# Test the Airflow PostgreSQL user over TCP
+psql -h 127.0.0.1 -U airflow -d airflow
+
+# Enter the PostgreSQL password created in Section 9.
+
+# Exit psql:
+\q
+
+# One-line verification
+psql -h 127.0.0.1 -U airflow -d airflow \
+  -c "SELECT current_user, current_database();"
+
+# Expected result:
+# current_user = airflow
+# current_database = airflow
+
+
+============================================================
+12. GRANT AIRFLOW SCHEMA PRIVILEGES
+============================================================
+
+# Airflow must be able to create its metadata tables.
+# PostgreSQL installations may require explicit privileges on the public schema.
+
+sudo -u postgres psql
+
+# Run inside psql:
+ALTER DATABASE airflow OWNER TO airflow;
+\c airflow
+GRANT ALL ON SCHEMA public TO airflow;
+ALTER SCHEMA public OWNER TO airflow;
+
+\q
+
+
+============================================================
+13. CONFIGURE AIRFLOW TO USE POSTGRESQL
+============================================================
+
+# Check current database configuration
+airflow config get-value database sql_alchemy_conn
+
+# Edit airflow.cfg
+vi /home/hdu/airflow/airflow.cfg
+
+# Change the SQLite setting, for example:
+# sql_alchemy_conn = sqlite:////home/hdu/airflow/airflow.db
+
+# to PostgreSQL:
+sql_alchemy_conn = postgresql+psycopg2://airflow:<POSTGRES_AIRFLOW_PASSWORD>@localhost:5432/airflow
+
+# Verify
+airflow config get-value database sql_alchemy_conn
+
+
+============================================================
+14. CHANGE EXECUTOR TO LOCALEXECUTOR
+============================================================
+
+# Check current executor
+airflow config get-value core executor
+
+# Edit airflow.cfg
+vi /home/hdu/airflow/airflow.cfg
+
+# Change:
+# executor = SequentialExecutor
+
+# to:
+executor = LocalExecutor
+
+# Verify
+airflow config get-value core executor
+
+# Expected:
+# LocalExecutor
+
+
+============================================================
+15. INITIALIZE / MIGRATE AIRFLOW METADATA DATABASE
+============================================================
+
+# Airflow 2.8.1 recommends db migrate.
+# db init is deprecated.
+airflow db migrate
+
+# Expected successful output includes PostgreSQL as the DB backend
+# and a successful database migration.
+
+# If you receive:
+# psycopg2.errors.InsufficientPrivilege:
+# permission denied for schema public
+#
+# return to Section 12 and grant ownership/privileges on schema public.
+
+
+============================================================
+16. VERIFY FINAL AIRFLOW CONFIGURATION
+============================================================
+
+airflow config get-value database sql_alchemy_conn
+airflow config get-value core executor
+airflow info | grep -E "airflow_home|airflow_config"
+
+# Expected:
+# sql_alchemy_conn = postgresql+psycopg2://airflow:***@localhost:5432/airflow
+# executor = LocalExecutor
+# airflow_home = /home/hdu/airflow
+
+
+============================================================
+17. CREATE AIRFLOW ADMIN USER
+============================================================
+
+# Create the Airflow UI login user
+airflow users create \
+    --username airflow \
+    --firstname airflow \
+    --lastname airflow \
+    --role Admin \
+    --email airflow@example.com
+
+# Airflow will prompt for a password.
+# IMPORTANT:
+# This is the AIRFLOW UI password. It is separate from the PostgreSQL password.
+
+# Verify
+airflow users list
+
+# If the Airflow UI password is forgotten:
+airflow users reset-password --username airflow
+
+
+============================================================
+18. START THE AIRFLOW SCHEDULER
+============================================================
+
+# Start scheduler in the background
+nohup airflow scheduler > ~/airflow/scheduler.log 2>&1 &
+
+# Verify process
+ps -ef | grep '[a]irflow scheduler'
+
+# Monitor scheduler log
+tail -f ~/airflow/scheduler.log
+
+
+============================================================
+19. START THE AIRFLOW WEBSERVER
+============================================================
+
+# Start webserver on port 8080
+nohup airflow webserver --port 8080 > ~/airflow/webserver.log 2>&1 &
+
+# Verify process
+ps -ef | grep '[a]irflow webserver'
+
+# Verify port
+sudo ss -lntp | grep 8080
+
+# Monitor webserver log
+tail -f ~/airflow/webserver.log
+
+# If port 8080 is already in use, identify the process:
+sudo ss -lntp | grep 8080
+
+ps -ef | grep '[a]irflow webserver'
+
+# Stop the old webserver if appropriate, or use another port:
+nohup airflow webserver --port 8081 > ~/airflow/webserver.log 2>&1 &
+
+
+============================================================
+20. ACCESS AIRFLOW WEB UI
+============================================================
+
+# From the Airflow server itself:
+http://localhost:8080
+
+# If accessing from another machine:
+http://<UBUNTU_SERVER_IP_ADDRESS>:8080
+
+# Login:
+Username: airflow
+Password: <AIRFLOW_UI_PASSWORD>
+
+# IMPORTANT:
+# The UI password is the password entered in Section 17.
+# It is NOT automatically the PostgreSQL password.
+
+
+============================================================
+21. OPTIONAL UBUNTU FIREWALL CONFIGURATION
+============================================================
+
+# Only if remote access to Airflow is required.
+
+# Check UFW status:
+sudo ufw status
+
+# Allow Airflow port 8080:
+sudo ufw allow 8080/tcp
+
+# Verify:
+sudo ufw status
+
+# Only expose the port when remote browser access is actually needed.
+
+
+============================================================
+22. FINAL HEALTH CHECK
+============================================================
+
+# Python
+python --version
+
+# Java
+java -version
+
+# Airflow
+airflow version
+
+# Airflow home
+echo $AIRFLOW_HOME
+
+# Database configuration
+airflow config get-value database sql_alchemy_conn
+
+# Executor
+airflow config get-value core executor
+
+# Airflow users
+airflow users list
+
+# PostgreSQL service
+sudo systemctl status postgresql
+
+# PostgreSQL connectivity
+psql -h 127.0.0.1 -U airflow -d airflow \
+  -c "SELECT current_user, current_database();"
+
+# Airflow processes
+ps -ef | grep '[a]irflow'
+
+# Webserver port
+sudo ss -lntp | grep 8080
+
+
+============================================================
+23. EXPECTED FINAL ARCHITECTURE
+============================================================
+
+                    +----------------------+
+                    |   Airflow Web UI     |
+                    |      :8080           |
+                    +----------+-----------+
+                               |
+                               |
+                    +----------v-----------+
+                    | Airflow Scheduler    |
+                    |                      |
+                    |   LocalExecutor      |
+                    +----------+-----------+
+                               |
+                               |
+                    +----------v-----------+
+                    | PostgreSQL           |
+                    | Database: airflow    |
+                    +----------------------+
+
+Configuration:
+    OS              : Ubuntu
+    Python          : 3.8 or 3.9
+    Virtualenv      : /home/hdu/my-venv
+    AIRFLOW_HOME    : /home/hdu/airflow
+    Airflow         : 2.8.1
+    Metadata DB     : PostgreSQL
+    DB name         : airflow
+    DB user         : airflow
+    Executor        : LocalExecutor
+    Webserver       : port 8080
+
+
+============================================================
+24. COMMON PROBLEMS AND FIXES
+============================================================
+
+PROBLEM 1: Wrong Airflow constraint file
+------------------------------------------------------------
+Symptom:
+Installation fails or dependency resolution behaves unexpectedly.
+
+Fix:
+Use the constraint file matching the Python version.
+
+Python 3.8:
+https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt
+
+Python 3.9:
+https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.9.txt
+
+
+PROBLEM 2: Ident authentication failed
+------------------------------------------------------------
+Symptom:
+FATAL: Ident authentication failed for user "airflow"
+
+Cause:
+PostgreSQL TCP localhost connections are using ident authentication.
+
+Fix:
+In Ubuntu pg_hba.conf use:
+
+host    all    all    127.0.0.1/32    scram-sha-256
+host    all    all    ::1/128         scram-sha-256
+
+Then:
+sudo systemctl reload postgresql
+
+
+PROBLEM 3: Peer authentication failed
+------------------------------------------------------------
+Symptom:
+FATAL: Peer authentication failed for user "airflow"
+
+Cause:
+The connection is using a Unix socket and PostgreSQL expects the
+operating-system username to match the database username.
+
+Fix:
+For Airflow testing, use TCP explicitly:
+
+psql -h 127.0.0.1 -U airflow -d airflow
+
+Keep:
+local   all   all   peer
+
+for normal postgres administrator access.
+
+
+PROBLEM 4: sudo -u postgres psql asks for a password
+------------------------------------------------------------
+Cause:
+The local peer authentication rule was changed.
+
+Fix:
+Restore:
+
+local   all   all   peer
+
+Then reload:
+
+sudo systemctl reload postgresql
+
+Test:
+
+sudo -u postgres psql
+
+
+PROBLEM 5: permission denied for schema public
+------------------------------------------------------------
+Symptom:
+psycopg2.errors.InsufficientPrivilege:
+permission denied for schema public
+
+Fix:
+
+sudo -u postgres psql
+
+ALTER DATABASE airflow OWNER TO airflow;
+\c airflow
+GRANT ALL ON SCHEMA public TO airflow;
+ALTER SCHEMA public OWNER TO airflow;
+
+\q
+
+Then:
+
+airflow db migrate
+
+
+PROBLEM 6: Port 8080 already in use
+------------------------------------------------------------
+Find the process:
+
+sudo ss -lntp | grep 8080
+
+Stop the old Airflow webserver if appropriate, or use another port:
+
+airflow webserver --port 8081
+
+
+PROBLEM 7: Airflow UI login password forgotten
+------------------------------------------------------------
+Reset it:
+
+airflow users reset-password --username airflow
+
+The PostgreSQL password does not determine the Airflow UI password.
+
+
+============================================================
+25. SQLITE AND POSTGRESQL
+============================================================
+
+# An initial Airflow installation may create:
+# /home/hdu/airflow/airflow.db
+# when SQLite is used.
+
+# After changing sql_alchemy_conn to PostgreSQL, Airflow uses PostgreSQL
+# for its metadata database.
+
+# The existing SQLite metadata is NOT automatically copied into PostgreSQL
+# by airflow db migrate.
+
+# Therefore, if this was only a fresh lab installation, the old SQLite file
+# can be retained as a backup/reference.
+# Do not delete it until you are certain it is no longer required.
+
+
+============================================================
+26. STANDALONE VS MANUAL STARTUP
+============================================================
+
+# airflow standalone is a convenience command for local testing.
+# It can initialize the database, create an admin user, and start
+# Airflow components.
+
+# For the configured PostgreSQL + LocalExecutor lab, use:
+
+nohup airflow scheduler > ~/airflow/scheduler.log 2>&1 &
+nohup airflow webserver --port 8080 > ~/airflow/webserver.log 2>&1 &
+
+# Do not run airflow standalone at the same time as these processes.
+
+# If standalone is already running, stop it before starting the
+# scheduler/webserver manually:
+
+pkill -f "airflow scheduler"
+pkill -f "airflow webserver"
+
+
+============================================================
+27. QUICK START AFTER REBOOT
+============================================================
+
+# Activate environment:
+source /home/hdu/my-venv/bin/activate
+
+# Set Airflow home if not already in ~/.bashrc:
+export AIRFLOW_HOME=/home/hdu/airflow
+
+# Ensure PostgreSQL is running:
+sudo systemctl start postgresql
+
+# Start scheduler:
+nohup airflow scheduler > ~/airflow/scheduler.log 2>&1 &
+
+# Start webserver:
+nohup airflow webserver --port 8080 > ~/airflow/webserver.log 2>&1 &
+
+# Verify:
+ps -ef | grep '[a]irflow'
+sudo ss -lntp | grep 8080
+
+# Open:
+http://localhost:8080
+
+
+============================================================
+28. OPTIONAL UBUNTU VS CODE SETUP
+============================================================
+
+sudo apt install -y snapd
+sudo snap install code --classic
+
+# This is independent of the Airflow installation.
+
+
+============================================================
+29. FINAL CHECKLIST
+============================================================
+
+[ ] Ubuntu instance prepared
+[ ] Java 11 installed and JAVA_HOME configured
+[ ] Python 3.8 or 3.9 verified
+[ ] Python virtual environment created
+[ ] Airflow 2.8.1 installed
+[ ] AIRFLOW_HOME configured
+[ ] PostgreSQL installed and running
+[ ] PostgreSQL database "airflow" created
+[ ] PostgreSQL user "airflow" created
+[ ] pg_hba.conf configured for password-based TCP access
+[ ] local peer authentication retained for postgres administration
+[ ] Airflow user has public-schema privileges
+[ ] sql_alchemy_conn points to PostgreSQL
+[ ] executor = LocalExecutor
+[ ] airflow db migrate completed successfully
+[ ] Airflow Admin user created
+[ ] Scheduler running
+[ ] Webserver running
+[ ] Port 8080 accessible
+[ ] Airflow UI login verified
+
+
+============================================================
+END
+============================================================
