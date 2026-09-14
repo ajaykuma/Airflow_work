@@ -845,3 +845,144 @@ END
 ============================================================
 airflow scheduler stop
 airflow webserver stop
+
+==============================
+After Restart:
+sudo systemctl status postgresql
+source /home/hdu/my-venv/bin/activate
+python --version
+airflow version
+echo $AIRFLOW_HOME
+#airflow info | grep -E "airflow_home|airflow_config"
+#We already successfully migrated the database:
+#DB: postgresql+psycopg2://airflow:***@localhost:5432/airflow
+#Database migrating done!
+
+#We only need database migration when you install/change Airflow versions or otherwise need a schema upgrade.
+
+--Start Airflow scheduler
+nohup airflow scheduler > ~/airflow/scheduler.log 2>&1 &
+
+--check
+ps -ef | grep '[a]irflow scheduler'
+--or check log
+tail -f ~/airflow/scheduler.log
+
+--start airflow webserver
+nohup airflow webserver --port 8080 > ~/airflow/webserver.log 2>&1 &
+
+--check
+ps -ef | grep '[a]irflow webserver'
+
+--and
+sudo ss -lntp | grep 8080
+
+(my-venv) [hdu@m1 ~]$ cd airflow/
+(my-venv) [hdu@m1 airflow]$ mkdir dags
+(my-venv) [hdu@m1 airflow]$ cd dags
+
+--refer dag files
+For example:
+1st DAG:
+
+vi sample_dag_v0.py
+--add content from file
+
+<save>
+
+--check if airflow detected dag,The scheduler periodically scans the dags path.
+(my-venv) [hdu@m1 dags]$ airflow dags list
+
+--check if dag has import errors (If your Python file has a syntax error or missing package)
+airflow dags list-import-errors
+
+--check in UI & test it by triggering it
+
+--from command line we can trigger
+airflow dags trigger sample_dag_v0
+
+--from command line
+airflow tasks list sample_dag_v0
+airflow dags list-runs -d sample_dag_v0
+
+--Testing a particular task
+airflow tasks test sample_dag_v0 1st_task 2026-09-14
+
+in DAG
+start_date means : the earliest date/time from which Airflow considers this DAG's schedule to begin.
+
+so if we have
+start_date=datetime(2024, 11, 20, 2)
+schedule='@daily'
+--it means DAG has a daily schedule, beginning with a schedule anchored at November 20, 2024 at 02:00,
+So conceptually, Airflow creates daily scheduling intervals from that point onward, it does NOT mean "start running at 2 AM".
+For a daily DAG, the start_date represents the beginning of the scheduling period, not necessarily the time when the task executes.
+
+Since 2024 is already in the past, when the scheduler sees this DAG, it can consider the scheduled intervals that have occurred 
+since that date. Whether Airflow actually creates all those historical runs depends on settings such as catchup.
+
+so instead of this 
+with DAG(
+    dag_id='sample_dag_v0',
+    description='Testing sample dag',
+    default_args=default_args,
+    start_date=datetime(2024, 11, 20, 2),
+    schedule_interval='@daily',
+) as dag:
+
+we can have
+with DAG(
+    dag_id='sample_dag_v0',
+    description='Testing sample dag',
+    default_args=default_args,
+    start_date=datetime(2024, 11, 20, 2),
+    schedule='@daily', #in newer version
+    catchup=False
+) as dag:
+
+Note**if we manually trigger the DAG, catchup=False doesn't prevent that run. 
+It only affects the scheduler's handling of missed scheduled intervals.
+Also remember in UI: Unpaused = permission to schedule (not guaranteed to schedule)-it depends on if dag file is present.
+
+when we manually trigger, we see the run 'manual' and thats not for the time which has passed and it will run again
+as per schedule and interval (if left unpaused)
+
+v1
+
+with DAG(
+    dag_id='sample_dag_v1',
+    description='Testing sample dag',
+    default_args=default_args,
+    start_date=datetime(2026, 9, 13, 2),
+    schedule='@daily', #in newer version
+    #schedule_interval='@daily',
+    catchup=False
+) as dag:
+
+v2
+
+with DAG(
+    dag_id='sample_dag_v2',
+    description='Testing sample dag',
+    default_args=default_args,
+    start_date=datetime(2026, 9, 14),
+    schedule='35 10 * * *', #scheduled to run at 10.35 am daily
+    #schedule_interval='@daily',
+    catchup=False
+) as dag:
+
+airflow dags next-execution sample_dag_v2
+
+
+
+
+
+
+
+
+
+
+
+
+
+

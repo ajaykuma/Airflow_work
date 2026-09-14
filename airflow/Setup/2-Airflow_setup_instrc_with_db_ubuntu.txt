@@ -98,8 +98,11 @@ pip install "apache-airflow[postgres]==2.8.1" \
   --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.8.txt"
 
 # Python 3.9:
-# pip install "apache-airflow[postgres]==2.8.1" \
+#pip install "apache-airflow[postgres]==2.8.1" \
 #   --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.9.txt"
+
+pip install "apache-airflow[postgres]==2.8.1" \
+   --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.10.txt"
 
 # Verify installation
 airflow version
@@ -117,6 +120,8 @@ export AIRFLOW_HOME=/home/hdu/airflow
 echo 'export AIRFLOW_HOME=/home/hdu/airflow' >> ~/.bashrc
 
 source ~/.bashrc
+
+hdu@m2:~$ source /home/hdu/my-venv/bin/activate
 
 # Verify
 echo $AIRFLOW_HOME
@@ -166,7 +171,7 @@ pg_lsclusters
 
 # If the PostgreSQL cluster is down, start it.
 # Replace <version> with the installed PostgreSQL version.
-sudo pg_ctlcluster <version> main start
+#sudo pg_ctlcluster <version> main start
 
 # Verify PostgreSQL is listening on port 5432
 sudo ss -lntp | grep 5432
@@ -363,7 +368,7 @@ airflow users create \
 airflow users list
 
 # If the Airflow UI password is forgotten:
-airflow users reset-password --username airflow
+#airflow users reset-password --username airflow
 
 
 ============================================================
@@ -741,3 +746,7 @@ sudo snap install code --classic
 ============================================================
 END
 ============================================================
+
+
+
+

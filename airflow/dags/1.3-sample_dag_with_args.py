@@ -19,15 +19,15 @@ file.close()
 
 print(default_args)
 
-with DAG (
-
-    dag_id = 'sample_dag_v1',
-    description = 'Testing sample dag with args from file',
+with DAG(
+    dag_id='sample_dag_with_args_v1',
+    description='Testing sample dag',
     default_args=default_args,
-    start_date=datetime(2024,11,20,2),
-    schedule_interval='@daily'
-
+    start_date=datetime(2026, 9, 13, 2),
+    schedule='@daily', 
+    catchup=False 
 ) as dag:
+    
     task1 = BashOperator(
         task_id ='1st_task',
         bash_command='echo hello wrld, this is the first task of sample DAG '
