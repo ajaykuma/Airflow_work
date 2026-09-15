@@ -21,7 +21,7 @@ default_args = {
 # DAG
 
 @dag(
-    dag_id="sample_dag_taskapi_xcom_v1",
+    dag_id="sample_dag_taskapi_xcom_v2",
     description="Testing TaskFlow API, XCom and JSON file usage",
     default_args=default_args,
     start_date=datetime(2026, 9, 12),

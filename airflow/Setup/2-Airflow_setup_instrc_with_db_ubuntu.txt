@@ -388,7 +388,7 @@ tail -f ~/airflow/scheduler.log
 ============================================================
 19. START THE AIRFLOW WEBSERVER
 ============================================================
-
+source /home/hdu/my-venv/bin/activate
 # Start webserver on port 8080
 nohup airflow webserver --port 8080 > ~/airflow/webserver.log 2>&1 &
 
@@ -407,7 +407,7 @@ sudo ss -lntp | grep 8080
 ps -ef | grep '[a]irflow webserver'
 
 # Stop the old webserver if appropriate, or use another port:
-nohup airflow webserver --port 8081 > ~/airflow/webserver.log 2>&1 &
+#nohup airflow webserver --port 8081 > ~/airflow/webserver.log 2>&1 &
 
 
 ============================================================
