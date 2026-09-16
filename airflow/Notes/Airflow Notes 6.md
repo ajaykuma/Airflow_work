@@ -1,6 +1,6 @@
-# AIRFLOW NOTES 6
+## AIRFLOW NOTES 6
 
-# DAG with Catchup and Backfill
+## DAG with Catchup and Backfill
 
 In this section, we will work with:
 
@@ -11,7 +11,7 @@ In this section, we will work with:
 
 ---
 
-# EX1: DAG with Catchup Enabled
+## EX1: DAG with Catchup Enabled
 
 ```python
 from airflow import DAG
@@ -47,7 +47,7 @@ task1
 
 ---
 
-## Catchup
+### Catchup
 
 In the above DAG:
 
@@ -77,7 +77,7 @@ Test the DAG and observe its behavior.
 
 ---
 
-# EX2: Disable Catchup
+## EX2: Disable Catchup
 
 Now check the behavior by changing the `catchup` value to:
 
@@ -116,7 +116,7 @@ for the following backfill experiment.
 
 ---
 
-# EX3: Using Backfill
+## EX3: Using Backfill
 
 Backfill can be run using an Airflow command.
 
@@ -144,6 +144,7 @@ airflow dags backfill
         └── DAG ID
 ```
 
+```
 This allows the DAG to be run for the specified date range.
 If DAG runs existed,we can see something interesting in CLI/UI
 CLI- airflow dags list-runs -d dag_with_catchup_backfill
@@ -167,8 +168,8 @@ ckfill              | -04T00:00:00+00:00 |         | 0+00:00            | 3.5069
 dag_with_catchup_ba | scheduled__2026-09 | success | 2026-09-02T00:00:0 | 2026-09-15T23:12:0 | 2026-09-15T23:12:08
 ckfill              | -02T00:00:00+00:00 |         | 0+00:00            | 3.483156+00:00     | .313691+00:00
 
-in UI:
-Look at Run Type before and after Backfill and look at timestamp in Start and End Date.
+in UI: Look at Run Type before and after Backfill and look at timestamp in Start and End Date.
+```
 ---
 
 # DAG Scheduling with Cron Expressions
