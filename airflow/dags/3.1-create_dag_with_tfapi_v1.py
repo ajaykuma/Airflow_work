@@ -19,7 +19,7 @@ default_args = {
 
 def new_etl():
 
-    @task(multiple_outputs=True)
+    @task(multiple_outputs=True) #Airflow treats the dictionary as separate XCom values.
     def get_name():
         return {
              'first_name': 'John',
@@ -34,9 +34,16 @@ def new_etl():
     def greet(first_name,last_name,age):
         print(f"Hello world, my name is {first_name} {last_name} "
           f" and iam {age} years old ")
-      
+
+    """these are XComArgs"""
+    """Here functions dont execute immediately"""
     name_dict = get_name()
+    #gives you an XComArg that can access individual keys
     age = get_age()
-    greet(first_name=name_dict['first_name'],last_name=name_dict['last_name'],age=age)
+
+    
+    greet(first_name=name_dict['first_name'],
+          last_name=name_dict['last_name'],
+          age=age)
 
 greet_dag = new_etl()

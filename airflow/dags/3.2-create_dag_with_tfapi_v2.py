@@ -73,7 +73,17 @@ def customer_etl():
 
         return customer
 
+    """
+    config   = XComArg(read_config)
+    customer = XComArg(read_customer)
 
+    | Variable   | Type conceptually | Points to                        |
+    | ---------- | ----------------- | -------------------------------- |
+    | `config`   | `XComArg`         | Output/XCom of `read_config`     |
+    | `customer` | `XComArg`         | Output/XCom of `read_customer`   |
+    | `greeting` | `XComArg`         | Output/XCom of `create_greeting` |
+
+    """
     # -----------------------------------------------------
     # Task 3: Use values returned by previous tasks
     # -----------------------------------------------------
@@ -121,6 +131,7 @@ def customer_etl():
 
     customer = read_customer()
 
+    #automatic dependency is created here
     greeting = create_greeting(
         config=config,
         customer=customer
