@@ -1,4 +1,4 @@
-# Notes 8.2 — Airflow Executors
+## Notes 8.2 — Airflow Executors
 
 ## 1. What is an Executor?
 
@@ -31,7 +31,7 @@ airflow/executors/
 
 ---
 
-# 2. BaseExecutor
+## 2. BaseExecutor
 
 `BaseExecutor` provides common functionality used by the different executor implementations.
 
@@ -67,7 +67,7 @@ class BaseExecutor(LoggingMixin):
 
 ---
 
-# 3. Important BaseExecutor functions
+## 3. Important BaseExecutor functions
 
 Some important functions implemented by `BaseExecutor` are:
 
@@ -106,7 +106,7 @@ Their basic purpose is:
 
 ---
 
-# 4. `validate_airflow_tasks_run_command`
+## 4. `validate_airflow_tasks_run_command`
 
 `BaseExecutor` also validates the command that is being submitted.
 
@@ -147,7 +147,7 @@ This validation is used by several executor implementations, including:
 
 ---
 
-# 5. SequentialExecutor
+## 5. SequentialExecutor
 
 The `SequentialExecutor` is the simplest executor.
 
@@ -203,7 +203,7 @@ It is also the executor that can be used with SQLite, because SQLite does not su
 
 ---
 
-# 6. LocalExecutor
+## 6. LocalExecutor
 
 The `LocalExecutor` allows tasks to run **in parallel on the same machine**.
 
@@ -234,7 +234,7 @@ UnlimitedParallelism     LimitedParallelism
 
 ---
 
-# 7. UnlimitedParallelism
+## 7. UnlimitedParallelism
 
 When:
 
@@ -288,7 +288,7 @@ Continues synchronizing while active workers are still running.
 
 ---
 
-# 8. LimitedParallelism
+## 8. LimitedParallelism
 
 When:
 
@@ -335,7 +335,7 @@ Tasks waiting in the queue are executed when a worker becomes available.
 
 ---
 
-# 9. CeleryExecutor
+## 9. CeleryExecutor
 
 The `CeleryExecutor` is designed for **distributed task execution**.
 
@@ -358,7 +358,7 @@ This makes CeleryExecutor suitable for larger production environments where task
 
 ---
 
-# 10. CeleryExecutor configuration
+## 10. CeleryExecutor configuration
 
 A Celery application is created using the Celery configuration:
 
@@ -400,7 +400,7 @@ Airflow updates task state
 
 ---
 
-# 11. How does CeleryExecutor submit tasks?
+## 11. How does CeleryExecutor submit tasks?
 
 The process can be represented as:
 
@@ -428,7 +428,7 @@ The Celery executor then sends those tasks to Celery.
 
 ---
 
-# 12. `_send_tasks_to_celery()`
+## 12. `_send_tasks_to_celery()`
 
 The function:
 
@@ -458,7 +458,7 @@ Conceptually:
 
 ---
 
-# 13. `send_task_to_executor()`
+## 13. `send_task_to_executor()`
 
 The task is ultimately submitted to Celery using:
 
@@ -494,7 +494,7 @@ The Celery worker then executes the task.
 
 ---
 
-# 14. Starting a Celery Worker
+## 14. Starting a Celery Worker
 
 For CeleryExecutor to execute tasks, Celery workers need to be running.
 
@@ -547,7 +547,7 @@ Conceptually:
 
 ---
 
-# 15. Executor comparison
+## 15. Executor comparison
 
 | Executor | Where tasks run | Parallel execution | Typical use |
 |---|---|---:|---|
@@ -558,7 +558,7 @@ Conceptually:
 
 ---
 
-# 16. Scheduling vs Execution
+## 16. Scheduling vs Execution
 
 One of the most important concepts is that **scheduling and execution are different things**.
 
@@ -604,7 +604,7 @@ The overall flow is:
 
 ---
 
-# 17. Key Takeaways
+## 17. Key Takeaways
 
 ### SequentialExecutor
 

@@ -172,7 +172,7 @@ in UI: Look at Run Type before and after Backfill and look at timestamp in Start
 ```
 ---
 
-# DAG Scheduling with Cron Expressions
+## DAG Scheduling with Cron Expressions
 
 The `schedule_interval` parameter can receive:
 
@@ -193,7 +193,7 @@ schedule_interval='@daily'
 
 ---
 
-# Understanding a Cron Expression
+## Understanding a Cron Expression
 
 A standard cron expression contains five fields.
 
@@ -224,7 +224,7 @@ This can be represented as:
 
 ---
 
-## Important Note
+### Important Note
 
 Use:
 
@@ -242,7 +242,7 @@ when you do not want to schedule the DAG.
 
 ---
 
-# Scheduling Presets
+## Scheduling Presets
 
 Airflow provides scheduling presets.
 
@@ -346,7 +346,7 @@ Equivalent cron expression:
 
 ---
 
-# EX4: Creating a DAG Using a Cron Expression
+## EX4: Creating a DAG Using a Cron Expression
 
 ```python
 from airflow import DAG
@@ -400,9 +400,9 @@ schedule_interval='@daily'
 
 ---
 
-# Other Cron Examples
+## Other Cron Examples
 
-## Run at 3 AM every Tuesday and Friday
+### Run at 3 AM every Tuesday and Friday
 
 ```python
 schedule_interval='0 3 * * Tue,Fri'
@@ -425,7 +425,7 @@ Therefore, the DAG is scheduled to run:
 ```text
 Every Tuesday and Friday at 3:00 AM
 ```
-## Run every 15 minutes and system tasks
+### Run every 15 minutes and system tasks
 dag_file_disk_check.py
 
 This uses BashOperator to:
@@ -434,7 +434,7 @@ List those files.
 Check root filesystem disk usage.
 Print a warning if usage exceeds 80%.
 
-## Run 9 am and 6 pm every day
+### Run 9 am and 6 pm every day
 dag_daily_report.py
 
 This uses:

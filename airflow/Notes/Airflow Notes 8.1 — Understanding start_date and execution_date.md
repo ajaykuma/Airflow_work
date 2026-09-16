@@ -1,6 +1,6 @@
-# Notes 8.1 — Understanding `start_date` and `execution_date` / `logical_date`
+## Notes 8.1 — Understanding `start_date` and `execution_date` / `logical_date`
 
-## 1. Understanding `start_date`
+### 1. Understanding `start_date`
 
 Suppose we have a DAG that should run every day at midnight:
 
@@ -38,7 +38,7 @@ Therefore, the first run represents the interval beginning on **20-Nov-2024**, b
 
 ---
 
-## 2. Why does Airflow work this way?
+### 2. Why does Airflow work this way?
 
 This behavior is useful for data pipelines.
 
@@ -68,7 +68,7 @@ This allows the DAG to process a **completed data interval**.
 
 ---
 
-## 3. `catchup=False`
+### 3. `catchup=False`
 
 By default, Airflow can create runs for unexecuted intervals between the DAG's `start_date` and the current date.
 
@@ -113,7 +113,7 @@ Historical catchup runs are not created
 
 ---
 
-## 4. Can we automatically set `start_date` to today?
+### 4. Can we automatically set `start_date` to today?
 
 It may seem convenient to write:
 
@@ -159,7 +159,7 @@ when historical runs are not required.
 
 ---
 
-# 5. Understanding `execution_date`
+## 5. Understanding `execution_date`
 
 Older Airflow material commonly uses:
 
@@ -177,7 +177,7 @@ The logical date represents the **start of the data interval**, rather than the 
 
 ---
 
-## 6. Example
+### 6. Example
 
 ```python
 import datetime as dt
@@ -237,7 +237,7 @@ DAG actually runs:  21-Nov-2024 00:00
 
 ---
 
-# 7. `start_date` vs `logical_date`
+## 7. `start_date` vs `logical_date`
 
 These concepts are related but different.
 
@@ -280,7 +280,7 @@ Identifies the interval represented by a particular DAG run
 
 ---
 
-# 8. Why is this important?
+## 8. Why is this important?
 
 This distinction becomes very important when creating dependencies between DAGs or when processing time-based data.
 
@@ -305,7 +305,7 @@ Therefore, be careful when using dates and times to create dependencies or deter
 
 ---
 
-# 9. Important terms
+## 9. Important terms
 
 | Term | Meaning |
 |---|---|
@@ -318,7 +318,7 @@ Therefore, be careful when using dates and times to create dependencies or deter
 
 ---
 
-# 10. Mental model
+## 10. Mental model
 
 The easiest way to remember this is:
 

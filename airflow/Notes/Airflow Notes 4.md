@@ -1,6 +1,6 @@
-# AIRFLOW NOTES 4
+## AIRFLOW NOTES 4
 
-# Sharing Information Between Tasks
+## Sharing Information Between Tasks
 
 Airflow provides **XComs (Cross-Communication)** to allow tasks to exchange small amounts of information.
 
@@ -22,7 +22,7 @@ By default, a function's return value can be stored in XCom.
 
 ---
 
-# EX1: Basic XCom Using PythonOperator
+## EX1: Basic XCom Using PythonOperator
 
 Start with the PythonOperator example from Notes3.
 
@@ -90,7 +90,7 @@ This return value is automatically available through XCom.
 
 ---
 
-# EX2: Using XComs
+## EX2: Using XComs
 
 Now modify the DAG so that:
 
@@ -164,7 +164,7 @@ get_name
 
 ---
 
-# EX3: Pushing Multiple Values into XCom
+## EX3: Pushing Multiple Values into XCom
 
 We can explicitly push multiple values into XCom using:
 
@@ -202,7 +202,7 @@ last_name  -> Morgan
 
 ---
 
-## Pulling Multiple Values from XCom
+### Pulling Multiple Values from XCom
 
 Modify `greet()`:
 
@@ -245,7 +245,7 @@ ti.xcom_pull(
 
 ---
 
-# EX4: Getting Values from Multiple Tasks
+## EX4: Getting Values from Multiple Tasks
 
 Now add another function to provide the age.
 
@@ -332,7 +332,7 @@ The workflow is:
 
 ---
 
-# Final Code So Far
+## Final Code So Far
 
 ```python
 from airflow import DAG
@@ -419,7 +419,7 @@ with DAG(
 
 ---
 
-# Important Note About XCom Size
+## Important Note About XCom Size
 
 XCom is intended for **small amounts of data exchanged between tasks**.
 

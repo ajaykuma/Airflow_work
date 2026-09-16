@@ -1,5 +1,5 @@
-# AIRFLOW NOTES 5
-# Using the TaskFlow API
+## AIRFLOW NOTES 5
+## Using the TaskFlow API
 
 If you write most of your DAGs using plain Python code rather than Operators, the **TaskFlow API** can make it easier to author clean DAGs with less boilerplate by using the `@task` decorator.
 
@@ -26,7 +26,7 @@ This builds on the XCom concepts covered in **Airflow Notes 4**, but allows us t
 
 ---
 
-# EX1: Basic TaskFlow API
+## EX1: Basic TaskFlow API
 
 ```python
 from airflow import DAG
@@ -85,7 +85,7 @@ greet_dag = new_etl()
 
 ---
 
-## Understanding the Flow
+### Understanding the Flow
 
 There are three tasks:
 
@@ -154,7 +154,7 @@ get_age ───┘
 
 ---
 
-# EX2: Returning Multiple Outputs
+## EX2: Returning Multiple Outputs
 
 Now change the name task so that it returns:
 
@@ -230,7 +230,7 @@ greet_dag = new_etl()
 
 ---
 
-## Understanding `multiple_outputs=True`
+### Understanding `multiple_outputs=True`
 
 The `get_name()` task returns a dictionary:
 
@@ -278,7 +278,7 @@ get_age ────────────────────────
 
 ---
 
-# Key Points
+## Key Points
 
 ### `@dag`
 

@@ -1,6 +1,6 @@
-# AIRFLOW NOTES 3
+## AIRFLOW NOTES 3
 
-## EX1: Creating a Simple DAG
+### EX1: Creating a Simple DAG
 ### DAG folder
 
 Airflow looks for DAG files inside:
@@ -119,7 +119,7 @@ pip install graphviz
 
 ---
 
-# EX2: Adding More Tasks and Creating Dependencies
+## EX2: Adding More Tasks and Creating Dependencies
 
 Now add more tasks to the DAG.
 Change the DAG ID so that we can keep this as a separate version:
@@ -197,7 +197,7 @@ When experimenting with different versions, change the `dag_id` accordingly if y
 
 ---
 
-# EX3: Using PythonOperator
+## EX3: Using PythonOperator
 
 Instead of executing a Bash command, we can execute a Python function using `PythonOperator`.
 
@@ -244,7 +244,7 @@ tells Airflow which Python function should be executed.
 
 ---
 
-## Optional: Passing Parameters to a Python Function
+### Optional: Passing Parameters to a Python Function
 
 We can pass parameters to the Python function.
 
@@ -275,7 +275,7 @@ Here, `op_kwargs` is used to pass keyword arguments to the Python function.
 
 ---
 
-# Programmatically Unpause a DAG
+## Programmatically Unpause a DAG
 A DAG can also be unpaused programmatically.
 
 Example:
@@ -323,7 +323,7 @@ The basic idea is:
 
 ---
 
-## From the Command Line
+### From the Command Line
 
 A DAG can also be paused/unpaused using the Airflow CLI.
 
@@ -343,7 +343,7 @@ airflow dags unpause sample_dag_v2
 
 ---
 
-## Another Programmatic Approach
+### Another Programmatic Approach
 
 A DAG model can also be retrieved and updated directly:
 
@@ -365,6 +365,6 @@ dag.is_paused()
 
 ---
 
-## More Information
+### More Information
 Airflow REST API documentation:
 https://airflow.apache.org/docs/apache-airflow/stable/stable-rest-api-ref.html
