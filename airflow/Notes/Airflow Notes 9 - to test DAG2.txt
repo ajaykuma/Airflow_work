@@ -1,0 +1,36 @@
+#10-create_dag_test_depen3
+--start triggerer
+source /home/hdu/my-env/bin/activate
+export AIRFLOW_HOME=/home/hdu/airflow
+nohup airflow triggerer &
+
+--confirm
+ps aux | grep triggerer
+
+--check if files exists in dags
+/home/hdu/airflow/dags/10-create-dag-test-depen2.py
+/home/hdu/airflow/dags/10-create_dag_test_depen3.py
+
+--check for errors
+airflow dags list-import-errors
+
+airflow dags unpause sample_dag_with_timedeltaSensor_v0
+airflow dags unpause sample_dag_with_timedeltaSensor_v1
+
+airflow dags trigger sample_dag_with_timedeltaSensor_v0
+airflow dags trigger sample_dag_with_timedeltaSensor_v1
+
+--Watch task state transitions
+For DAG 1 (mode='reschedule'), watch the wait task in the UI or via
+airflow tasks states-for-dag-run sample_dag_with_timedeltaSensor_v0 <run_id>
+
+we see it cycle through up_for_reschedule rather than sitting in running — that's the worker slot being released between checks.
+
+For DAG 2, watch the wait task instead go to deferred state — that's the triggerer taking over, not a worker.
+tail -f /home/hdu/airflow/logs/triggerer/latest/*.log
+
+--confirm completion
+After the delta elapses, both wait tasks should flip to success, then the_task runs and logs Task executed
+
+airflow tasks logs sample_dag_with_timedeltaSensor_v0 the_task <run_id>
+
