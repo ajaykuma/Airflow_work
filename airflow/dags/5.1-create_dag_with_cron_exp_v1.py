@@ -2,7 +2,7 @@ from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-
+from myfuncs.processdata import process_data
 
 default_args = {
     'owner': 'hdu',
@@ -11,17 +11,17 @@ default_args = {
 }
 
 
-def process_data():
-    print("PythonOperator is processing the data...")
+# def process_data():
+#     print("PythonOperator is processing the data...")
     
-    numbers = [10, 20, 30, 40, 50]
+#     numbers = [10, 20, 30, 40, 50]
     
-    total = sum(numbers)
-    average = total / len(numbers)
+#     total = sum(numbers)
+#     average = total / len(numbers)
 
-    print(f"Numbers  : {numbers}")
-    print(f"Total    : {total}")
-    print(f"Average  : {average}")
+#     print(f"Numbers  : {numbers}")
+#     print(f"Total    : {total}")
+#     print(f"Average  : {average}")
 
 
 with DAG(

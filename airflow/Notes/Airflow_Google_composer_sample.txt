@@ -1,0 +1,65 @@
+#working_ google cloud composer - Airflow managed service
+
+--search google composer 
+  --enable all apis (as suggested)
+  --create a composer environment (with defaults and select medium(configuration) for schedulers, webservers, triggerers
+
+--From a vm instance terminal
+TRY THESE commands..
+
+ak7singhal@m2:~$ gcloud composer environments list     --locations europe-west3
+┌───────────────┬──────────────┬─────────┬─────────────────────────────┐
+│      NAME     │   LOCATION   │  STATE  │         CREATE_TIME         │
+├───────────────┼──────────────┼─────────┼─────────────────────────────┤
+│ composer-dev2 │ europe-west3 │ RUNNING │ 2026-09-17T10:36:31.021020Z │
+└───────────────┴──────────────┴─────────┴─────────────────────────────┘
+ak7singhal@m2:~$ export REGION=europe-west3
+export ENVIRONMENT=composer-dev2
+export BUCKET=europe-west3-composer-dev2-xxxxxx-bucket
+ak7singhal@m2:~$ gcloud storage ls \
+    gs://$BUCKET/dags/
+gs://europe-west3-composer-dev2-xxxxxx-bucket/dags/
+
+gs://europe-west3-composer-dev2-xxxxxx-bucket/dags/:
+gs://europe-west3-composer-dev2-xxxxxx-bucket/dags/
+gs://europe-west3-composer-dev2-xxxxxx-bucket/dags/1.1-sample_gc_dag_v1_new.py
+gs://europe-west3-composer-dev2-xxxxxx-bucket/dags/airflow_monitoring.py
+ak7singhal@m2:~$ gcloud composer environments run $ENVIRONMENT \
+    --location=$REGION \
+    dags list
+Executing the command: [ airflow dags list ]...
+Command has been started. execution_id=d75c3ad0-7633-4599-a264-e97a1151ef8b
+Use ctrl-c to interrupt the command
+[2026-09-17T12:00:04.066+0000] {trigger.py:102} INFO - Patching KubernetesPodOperator write_logs
+[2026-09-17T12:00:05.598+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.schemas
+[2026-09-17T12:00:05.599+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.tables
+[2026-09-17T12:00:05.600+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.types
+[2026-09-17T12:00:05.600+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.constraints
+[2026-09-17T12:00:05.600+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.defaults
+[2026-09-17T12:00:05.600+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.comments
+[2026-09-17T12:00:05.600+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.checkconstraint_byname
+dag_id             | fileloc                                            | owners  | is_paused
+===================+====================================================+=========+==========
+airflow_monitoring | /home/airflow/gcs/dags/airflow_monitoring.py       | airflow | False
+sample_dag_v1      | /home/airflow/gcs/dags/1.1-sample_gc_dag_v1_new.py | airflow | False
+ak7singhal@m2:~$ gcloud composer environments run $ENVIRONMENT \
+    --location=$REGION \
+    dags trigger -- sample_dag_v1
+Executing the command: [ airflow dags trigger sample_dag_v1 ]...
+Command has been started. execution_id=c505ab8f-66b3-41cd-afbc-a1a50272dda6
+Use ctrl-c to interrupt the command
+[2026-09-17T12:00:53.092+0000] {trigger.py:102} INFO - Patching KubernetesPodOperator write_logs
+[2026-09-17T12:00:54.564+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.schemas
+[2026-09-17T12:00:54.566+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.tables
+[2026-09-17T12:00:54.567+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.types
+[2026-09-17T12:00:54.567+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.constraints
+[2026-09-17T12:00:54.568+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.defaults
+[2026-09-17T12:00:54.568+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.comments
+[2026-09-17T12:00:54.568+0000] {plugins.py:37} INFO - setup plugin alembic.autogenerate.checkconstraint_byname
+[2026-09-17T12:00:55.100+0000] {__init__.py:43} INFO - Loaded API auth backend: airflow.composer.api.backend.composer_auth
+[2026-09-17T12:00:55.101+0000] {__init__.py:43} INFO - Loaded API auth backend: airflow.api.auth.backend.session
+|               |                      |                      |                       |          |                  | last_scheduling_deci |                       |          |            |
+conf | dag_id        | dag_run_id           | data_interval_start  | data_interval_end     | end_date | external_trigger | sion                 | logical_date          | run_type | start_date | state
+=====+===============+======================+======================+=======================+==========+==================+======================+=======================+==========+============+=======
+{}   | sample_dag_v1 | manual__2026-09-17T1 | 2026-09-17           | 2026-09-17            | None     | True             | None                 | 2026-09-17            | manual   | None       | queued
+|               | 2:00:56+00:00        | 11:50:00+00:00       | 12:00:00+00:00        |          |                  |                      | 12:00:56+00:00        |          |            |

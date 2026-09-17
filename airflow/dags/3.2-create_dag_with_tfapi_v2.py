@@ -128,9 +128,7 @@ def customer_etl():
     # -----------------------------------------------------
 
     config = read_config()
-
     customer = read_customer()
-
     #automatic dependency is created here
     greeting = create_greeting(
         config=config,

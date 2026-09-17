@@ -26,7 +26,9 @@ with DAG(
     description='Testing sample DAG with PythonOperator',
     default_args=default_args,
     start_date=datetime(2024, 11, 20, 2),
-    schedule_interval='@daily'
+    schedule_interval='@daily',
+    catchup=False
+
 ) as dag:
 
     # Previous task can be kept as an example:

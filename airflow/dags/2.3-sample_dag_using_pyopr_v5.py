@@ -5,7 +5,6 @@ from airflow.operators.python import PythonOperator
 
 #create instaance of DAG using 'with'
 
-
 #define common parameters which will be to initialize the operatr in default
 default_args = {
 

@@ -1,22 +1,27 @@
+import datetime
 from airflow import DAG
-from datetime import datetime, timedelta
-from airflow.operators.bash import BashOperator
+
+# pylint: disable=g-import-not-at-top
+try:
+  from airflow.providers.standard.operators.bash import BashOperator
+except ImportError:
+  from airflow.operators.bash_operator import BashOperator
+# pylint: enable=g-import-not-at-top
 
 default_args = {
-    'owner': 'hdu',
-    'retries': 5,
-    'retry_delay': timedelta(minutes=2)
+    'start_date': datetime.datetime(2026, 9, 15),
+    'retries': 1,
+    'retry_delay': datetime.timedelta(minutes=5),
 }
 
 with DAG(
-    dag_id='sample_dag_v2',
+    dag_id='sample_dag_v1',
     description='Testing sample dag',
     default_args=default_args,
-    start_date=datetime(2026, 9, 15),
-    schedule='56 11 * * *', #scheduled to run at 11.05 am daily
-    #scheduler evaulates DAG and checks if there is an eligible scheduled interval
-    #schedule_interval='@daily',
-    catchup=False
+    schedule='*/10 * * * *',
+    max_active_runs=2,
+    catchup=False,
+    dagrun_timeout=datetime.timedelta(minutes=10),
 ) as dag:
 
     task1 = BashOperator(
